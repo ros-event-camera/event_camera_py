@@ -1,0 +1,45 @@
+#
+# Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set(CMAKE_CXX_STANDARD 17)
+
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+
+add_definitions(-DUSING_ROS_1)
+
+find_package(catkin REQUIRED COMPONENTS
+  pybind11_catkin
+  event_array_msgs
+  event_array_codecs
+  )
+
+catkin_package(
+    LIBRARIES
+    CATKIN_DEPENDS pybind11_catkin
+)
+
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  )
+
+pybind_add_module(event_array_decoder MODULE src/decoder.cpp)
+
+
+install(TARGETS
+  event_array_decoder
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+

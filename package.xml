@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>event_array_py</name>
+  <version>1.0.0</version>
+  <description>Python access for event_array_msgs.</description>
+  <maintainer email="bernd.pfrommer@gmail.com">Bernd Pfrommer</maintainer>
+  <license>Apache License 2.0</license>
+  <author email="bernd.pfrommer@gmail.com">Bernd Pfrommer</author>
+
+  <!-- ROS2 dependencies -->
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_ros</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_auto</buildtool_depend>
+  <test_depend condition="$ROS_VERSION == 2">ament_lint_auto</test_depend>
+  <test_depend condition="$ROS_VERSION == 2">ament_lint_common</test_depend>
+
+  <!-- ROS1 dependencies -->
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <build_depend condition="$ROS_VERSION == 1">pybind11_catkin</build_depend>
+  <exec_depend condition="$ROS_VERSION == 1">pybind11_catkin</exec_depend>
+
+  <!--
+  <buildtool_depend>python_cmake_module</buildtool_depend>
+  <build_depend>pybind11_vendor</build_depend>
+  -->
+
+  <!--
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>rpyutils</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+  <doc_depend>python3-sphinx</doc_depend>
+  <doc_depend>python3-sphinx-rtd-theme</doc_depend>
+  -->
+
+  <!-- common ROS1/ROS2 dependencies -->
+  <depend>event_array_msgs</depend>
+  <depend>event_array_codecs</depend>
+
+  <export>
+    <!-- this is crucial else the package will not be registered! -->
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
+  </export>
+</package>
