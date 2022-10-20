@@ -29,16 +29,24 @@ def test_decoder(fname, topic):
     t0 = time.time()
     for topic, msg, t in bag.read_messages(topics=topic):
         decoder.decode(msg.encoding, msg.time_base, msg.events)
-        events = decoder.get_cd_events()
-        print(events)
+        cd_events = decoder.get_cd_events()
+        print(cd_events)
+        trig_events = decoder.get_ext_trig_events()
+        print(trig_events)
     t1 = time.time()
     bag.close()
-    print(f"ON events: {decoder.get_num_cd_on()} ",
+    print(f"ON  events: {decoder.get_num_cd_on()}\n",
           f"OFF events: {decoder.get_num_cd_off()}")
-    n = decoder.get_num_cd_on() + decoder.get_num_cd_off()
+    print(f"RISE trigger events: {decoder.get_num_trigger_rising()} ",
+          f"FALL trigger events: {decoder.get_num_trigger_falling()}")
+    n_cd = decoder.get_num_cd_on() + decoder.get_num_cd_off()
+    n_trig = decoder.get_num_trigger_rising() + \
+        decoder.get_num_trigger_falling()
     dt = t1 - t0
-    rate = n / dt
-    print(f"Total events: {n} in time: {dt:3f} rate: {rate * 1e-6} Mevs")
+    rate_cd = n_cd / dt
+    rate_trig = n_trig / dt
+    print(f"Total CD events: {n_cd} in time: {dt:3f} rate: {rate_cd * 1e-6} Mevs")
+    print(f"Total trigger events: {n_trig} in time: {dt:3f} rate: {rate_trig * 1e-6} Mevs")
 
 
 if __name__ == '__main__':

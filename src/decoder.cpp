@@ -36,8 +36,11 @@ void Decoder::decode(const std::string & encoding, uint64_t timeBase, pybind11::
     const std::string foo(events);  // creates unnecessary copy!
     delete cdEvents_;               // in case events have not been picked up
     cdEvents_ = new std::vector<EventCD>();
+    delete extTrigEvents_;  // in case events have not been picked up
+    extTrigEvents_ = new std::vector<EventExtTrig>();
     // TODO(Bernd): use hack here to avoid initializing the memory
     cdEvents_->reserve(maxSizeCD_);
+    extTrigEvents_->reserve(maxSizeExtTrig_);
     const uint8_t * buf = reinterpret_cast<const uint8_t *>(&foo[0]);
     decoder->decode(buf, bufSize, this);
   }
@@ -55,6 +58,18 @@ pybind11::array_t<EventCD> Decoder::get_cd_events()
   return (pybind11::array_t<EventCD>());
 }
 
+pybind11::array_t<EventExtTrig> Decoder::get_ext_trig_events()
+{
+  if (extTrigEvents_) {
+    auto p = extTrigEvents_;
+    auto cap = pybind11::capsule(
+      p, [](void * v) { delete reinterpret_cast<std::vector<EventExtTrig> *>(v); });
+    extTrigEvents_ = 0;  // clear out
+    return (pybind11::array_t<EventExtTrig>(p->size(), p->data(), cap));
+  }
+  return (pybind11::array_t<EventExtTrig>());
+}
+
 void Decoder::eventCD(uint64_t sensor_time, uint16_t ex, uint16_t ey, uint8_t polarity)
 {
   cdEvents_->push_back(EventCD(ex, ey, polarity, sensor_time / 1000));
@@ -64,20 +79,23 @@ void Decoder::eventCD(uint64_t sensor_time, uint16_t ex, uint16_t ey, uint8_t po
 
 void Decoder::eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id)
 {
-  (void)sensor_time;
-  (void)edge;
-  (void)id;
-  numTriggerEvents_[std::min(edge, uint8_t(1))]++;
+  extTrigEvents_->push_back(EventExtTrig(
+    static_cast<int16_t>(edge), static_cast<int64_t>(sensor_time), static_cast<int16_t>(id)));
+  maxSizeExtTrig_ = std::max(extTrigEvents_->size(), maxSizeExtTrig_);
+  numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
 }
 
 PYBIND11_MODULE(event_array_decoder, m)
 {
   PYBIND11_NUMPY_DTYPE(EventCD, x, y, p, t);
+  PYBIND11_NUMPY_DTYPE(EventExtTrig, p, t, id);
 
   pybind11::class_<Decoder>(m, "Decoder")
     .def(pybind11::init<>())
     .def("decode", &Decoder::decode, "Decode event array message")
     .def("get_cd_events", &Decoder::get_cd_events, "Get decoded CD events")
+    .def(
+      "get_ext_trig_events", &Decoder::get_ext_trig_events, "Get decoded external triggger events")
     .def("get_num_cd_on", &Decoder::get_num_cd_on, "Get number of ON events")
     .def("get_num_cd_off", &Decoder::get_num_cd_off, "Get number of OFF events")
     .def(

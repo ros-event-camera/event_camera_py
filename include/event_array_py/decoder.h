@@ -19,6 +19,7 @@
 #include <event_array_codecs/decoder.h>
 #include <event_array_codecs/decoder_factory.h>
 #include <event_array_py/event_cd.h>
+#include <event_array_py/event_ext_trig.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
@@ -37,18 +38,21 @@ public:
   // own methods
   void decode(const std::string & encoding, uint64_t timeBase, pybind11::bytes);
   pybind11::array_t<EventCD> get_cd_events();
+  pybind11::array_t<EventExtTrig> get_ext_trig_events();
 
   size_t get_num_cd_off() const { return (numCDEvents_[0]); }
   size_t get_num_cd_on() const { return (numCDEvents_[1]); }
-  size_t get_num_trigger_rising() const { return (numTriggerEvents_[0]); }
-  size_t get_num_trigger_falling() const { return (numTriggerEvents_[1]); }
+  size_t get_num_trigger_rising() const { return (numExtTrigEvents_[0]); }
+  size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
 
 private:
   event_array_codecs::DecoderFactory<Decoder> decoderFactory_;
   size_t numCDEvents_[2] = {0, 0};
-  size_t numTriggerEvents_[2] = {0, 0};
+  size_t numExtTrigEvents_[2] = {0, 0};
   std::vector<EventCD> * cdEvents_{0};
+  std::vector<EventExtTrig> * extTrigEvents_{0};
   size_t maxSizeCD_{0};
+  size_t maxSizeExtTrig_{0};
 };
 
 #endif  // EVENT_ARRAY_PY__DECODER_H_
