@@ -20,7 +20,7 @@
 import argparse
 import rosbag
 import time
-from event_array_decoder import Decoder
+from event_array_py import Decoder
 
 
 def test_decoder(fname, topic):

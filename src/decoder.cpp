@@ -85,23 +85,81 @@ void Decoder::eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id)
   numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
 }
 
-PYBIND11_MODULE(event_array_decoder, m)
+PYBIND11_MODULE(event_array_py, m)
 {
+  pybind11::options options;
+  options.disable_function_signatures();
+  m.doc() = R"pbdoc(
+        Plugin for processing event_array_msgs in python
+    )pbdoc";
+
   PYBIND11_NUMPY_DTYPE(EventCD, x, y, p, t);
   PYBIND11_NUMPY_DTYPE(EventExtTrig, p, t, id);
 
-  pybind11::class_<Decoder>(m, "Decoder")
+  pybind11::class_<Decoder>(
+    m, "Decoder",
+    R"pbdoc(
+        Class to decode event_array_msgs in python. The decoder
+        keeps state inbetween calls to decode(). After calling decode()
+        the events must be read via get_cd_events() before calling
+        decode() again.
+        Sample code:
+
+        decoder = Decoder()
+        for msg in msgs:
+            decoder.decode(msg.encoding, msg.time_base, msg.events)
+            cd_events = decoder.get_cd_events()
+            trig_events = decoder.get_ext_trig_events()
+)pbdoc")
     .def(pybind11::init<>())
-    .def("decode", &Decoder::decode, "Decode event array message")
-    .def("get_cd_events", &Decoder::get_cd_events, "Get decoded CD events")
-    .def(
-      "get_ext_trig_events", &Decoder::get_ext_trig_events, "Get decoded external triggger events")
-    .def("get_num_cd_on", &Decoder::get_num_cd_on, "Get number of ON events")
-    .def("get_num_cd_off", &Decoder::get_num_cd_off, "Get number of OFF events")
-    .def(
-      "get_num_trigger_rising", &Decoder::get_num_trigger_rising,
-      "Get number of rising edge trigger events")
-    .def(
-      "get_num_trigger_falling", &Decoder::get_num_trigger_falling,
-      "Get number of falling edge trigger events");
+    .def("decode", &Decoder::decode, R"pbdoc(
+        decode(encoding, time_base, buffer) -> None
+
+        Passes buffer of decoded events and updates state of the encoder.
+
+        :param encoding: Encoding string (e.g. "evt3") as provided by the message.
+        :type encoding: str
+        :param time_base: Time base as provided by the message. Some codecs use it to
+                          compute time stamps.
+        :type time_base: int
+        :param buffer: Buffer with encoded events to be processed, as provided by the message.
+        :type buffer: bytes
+)pbdoc")
+    .def("get_cd_events", &Decoder::get_cd_events, R"pbdoc(
+        get_cd_events() -> numpy.ndarray['EventCD']
+
+        Fetches decoded change detected (CD) events. Will clear out decoded events, to be
+        called only once. If not called, events will be lost next time decode() is called.
+
+        :return: array of detected events in the same format as the metavision SDK uses.
+        :rtype: numpy.ndarray[EventCD], structured numpy array with fields 'x', 'y', 't', 'p'
+)pbdoc")
+    .def("get_ext_trig_events", &Decoder::get_ext_trig_events, R"pbdoc(
+        get_ext_trig_events() -> numpy.ndarray['EventExtTrig']
+
+        Fetches decoded external trigger events. Will clear out decoded events, to be
+        called only once. If not called, events will be lost next time decode() is called.
+        :return: array of trigger events in the same format as the metavision SDK uses.
+        :rtype: numpy.ndarray[EventExtTrig], structured numpy array with fields 'p', 't', 'id'
+)pbdoc")
+    .def("get_num_cd_on", &Decoder::get_num_cd_on, R"pbdoc(
+        get_num_cd_on() -> int
+        :return: cumulative number of ON events.
+        :rtype: int
+)pbdoc")
+    .def("get_num_cd_off", &Decoder::get_num_cd_off, R"pbdoc(
+        get_num_cd_off() -> int
+        :return: cumulative number of OFF events.
+        :rtype: int
+)pbdoc")
+    .def("get_num_trigger_rising", &Decoder::get_num_trigger_rising, R"pbdoc(
+        get_num_trigger_rising() -> int
+        :return: cumulative number of rising edge external trigger events.
+        :rtype: int
+)pbdoc")
+    .def("get_num_trigger_falling", &Decoder::get_num_trigger_falling, R"pbdoc(
+        get_num_trigger_falling() -> int
+        :return: cumulative number of falling edge external trigger events.
+        :rtype: int
+)pbdoc");
 }

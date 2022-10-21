@@ -35,11 +35,11 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   )
 
-pybind_add_module(event_array_decoder MODULE src/decoder.cpp)
+pybind_add_module(event_array_py MODULE src/decoder.cpp)
 
 
 install(TARGETS
-  event_array_decoder
+  event_array_py
   LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
