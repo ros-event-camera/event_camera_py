@@ -137,7 +137,7 @@ PYBIND11_MODULE(_event_array_py, m)
     .def("decode_bytes", &Decoder::decode_bytes, R"pbdoc(
         decode_bytes(encoding, time_base, buffer) -> None
 
-        Passes buffer of decoded events and updates state of the encoder.
+        Processes buffer of encoded events and updates state of the decoder.
 
         :param encoding: Encoding string (e.g. "evt3") as provided by the message.
         :type encoding: str
@@ -150,7 +150,7 @@ PYBIND11_MODULE(_event_array_py, m)
     .def("decode_array", &Decoder::decode_array, R"pbdoc(
         decode_array(encoding, time_base, buffer) -> None
 
-        Passes buffer of decoded events and updates state of the encoder.
+        Processes buffer of encoded events and updates state of the decoder.
 
         :param encoding: Encoding string (e.g. "evt3") as provided by the message.
         :type encoding: str

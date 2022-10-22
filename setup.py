@@ -1,4 +1,5 @@
-#
+## ! DO NOT MANUALLY INVOKE THIS setup.py, USE CATKIN INSTEAD
+# -----------------------------------------------------------------------------
 # Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,35 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
 
-set(CMAKE_CXX_STANDARD 17)
+from setuptools import setup
+from catkin_pkg.python_setup import generate_distutils_setup
 
-add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+# fetch values from package.xml
+setup_args = generate_distutils_setup(
+    packages=['event_array_py'],
+    package_dir={'': 'src'})
 
-add_definitions(-DUSING_ROS_1)
-
-find_package(catkin REQUIRED COMPONENTS
-  pybind11_catkin
-  event_array_msgs
-  event_array_codecs
-  )
-
-catkin_package(
-    LIBRARIES
-    CATKIN_DEPENDS pybind11_catkin
-)
-
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  )
-
-pybind_add_module(_event_array_py MODULE src/decoder.cpp)
-
-
-install(TARGETS
-  _event_array_py
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-
-catkin_python_setup()
+setup(**setup_args)
