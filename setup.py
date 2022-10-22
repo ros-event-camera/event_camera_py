@@ -1,4 +1,4 @@
-## ! DO NOT MANUALLY INVOKE THIS setup.py, USE CATKIN INSTEAD
+# ! DO NOT MANUALLY INVOKE THIS setup.py, USE CATKIN INSTEAD
 # -----------------------------------------------------------------------------
 # Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 #
