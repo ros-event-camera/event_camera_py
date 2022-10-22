@@ -43,8 +43,7 @@ find_package(pybind11)
 pybind11_add_module(_event_array_py SHARED src/decoder.cpp)
 ament_target_dependencies(_event_array_py PUBLIC event_array_codecs pybind11)
 
-# this one is necessary to update the PYTHONPATH
-ament_python_install_package(${PROJECT_NAME})
+ament_python_install_module(../src/${PROJECT_NAME})
 
 target_include_directories(_event_array_py
   PUBLIC
