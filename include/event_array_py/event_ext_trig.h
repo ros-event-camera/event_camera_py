@@ -20,7 +20,7 @@
 
 struct EventExtTrig
 {
-  EventExtTrig(int16_t edge = 0, int64_t ta = 0, int16_t ida = 0) : p(edge), t(ta), id(ida) {}
+  explicit EventExtTrig(int16_t e = 0, int64_t ta = 0, int16_t ida = 0) : p(e), t(ta), id(ida) {}
   int16_t p;   // edge (rising or faling)
   int64_t t;   // time stamp
   int16_t id;  // source of trigger signal

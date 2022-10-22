@@ -40,22 +40,43 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo  #
 
 ## Decoding event array messages
 
-The following sample code shows how to decode event array messages
-under ROS1. The usage of the decoder is identical under ROS2.
+The following sample code shows how to decode event array messages under ROS1.
 ```
 import rosbag
 from event_array_py import Decoder
 
+topic = '/event_camera/events'
 bag = rosbag.Bag('foo.bag')
 decoder = Decoder()
 
 for topic, msg, t in bag.read_messages(topics=topic):
-    decoder.decode(msg.encoding, msg.time_base, msg.events)
+    decoder.decode_bytes(msg.encoding, msg.time_base, msg.events)
     cd_events = decoder.get_cd_events()
     print(cd_events)
     trig_events = decoder.get_ext_trig_events()
     print(trig_events)
 ```
+Here is a sample code for ROS2. It uses a helper class "BagReader"
+that you can find in the ``src`` folder. Note the conversion to numpy array:
+```
+import numpy as np
+from bag_reader_ros2 import BagReader
+from event_array_py import Decoder
+
+topic = '/event_camera/events'
+bag = BagReader('foo', topic)
+decoder = Decoder()
+
+while bag.has_next():
+        topic, msg, t_rec = bag.read_next()
+        decoder.decode_array(msg.encoding, msg.time_base,
+                             np.frombuffer(msg.events, dtype=np.uint8))
+        cd_events = decoder.get_cd_events()
+        print(cd_events)
+        trig_events = decoder.get_ext_trig_events()
+        print(trig_events)
+```
+
 The returned event arrays are structured numpy ndarrays that are
 compatible with Prophesee's Metavision SDK.
 

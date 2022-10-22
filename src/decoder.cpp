@@ -23,7 +23,7 @@
 
 Decoder::Decoder() {}
 
-void Decoder::decode(const std::string & encoding, uint64_t timeBase, pybind11::bytes events)
+void Decoder::decode_bytes(const std::string & encoding, uint64_t timeBase, pybind11::bytes events)
 {
   auto decoder = decoderFactory_.getInstance(encoding);
   if (decoder) {
@@ -43,6 +43,28 @@ void Decoder::decode(const std::string & encoding, uint64_t timeBase, pybind11::
     extTrigEvents_->reserve(maxSizeExtTrig_);
     const uint8_t * buf = reinterpret_cast<const uint8_t *>(&foo[0]);
     decoder->decode(buf, bufSize, this);
+  }
+}
+
+void Decoder::decode_array(const std::string & encoding, uint64_t timeBase, pybind11::array events)
+{
+  if (events.ndim() != 1 || !pybind11::isinstance<pybind11::array_t<uint8_t>>(events)) {
+    throw std::runtime_error("Input events must be 1-D numpy array of type uint8");
+  }
+
+  auto decoder = decoderFactory_.getInstance(encoding);
+  if (decoder) {
+    decoder->setTimeBase(timeBase);
+    decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
+    delete cdEvents_;               // in case events have not been picked up
+    cdEvents_ = new std::vector<EventCD>();
+    delete extTrigEvents_;  // in case events have not been picked up
+    extTrigEvents_ = new std::vector<EventExtTrig>();
+    // TODO(Bernd): use hack here to avoid initializing the memory
+    cdEvents_->reserve(maxSizeCD_);
+    extTrigEvents_->reserve(maxSizeExtTrig_);
+    const uint8_t * buf = reinterpret_cast<const uint8_t *>(events.data());
+    decoder->decode(buf, events.size(), this);
   }
 }
 
@@ -85,7 +107,7 @@ void Decoder::eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id)
   numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
 }
 
-PYBIND11_MODULE(event_array_py, m)
+PYBIND11_MODULE(_event_array_py, m)
 {
   pybind11::options options;
   options.disable_function_signatures();
@@ -112,8 +134,8 @@ PYBIND11_MODULE(event_array_py, m)
             trig_events = decoder.get_ext_trig_events()
 )pbdoc")
     .def(pybind11::init<>())
-    .def("decode", &Decoder::decode, R"pbdoc(
-        decode(encoding, time_base, buffer) -> None
+    .def("decode_bytes", &Decoder::decode_bytes, R"pbdoc(
+        decode_bytes(encoding, time_base, buffer) -> None
 
         Passes buffer of decoded events and updates state of the encoder.
 
@@ -124,6 +146,19 @@ PYBIND11_MODULE(event_array_py, m)
         :type time_base: int
         :param buffer: Buffer with encoded events to be processed, as provided by the message.
         :type buffer: bytes
+)pbdoc")
+    .def("decode_array", &Decoder::decode_array, R"pbdoc(
+        decode_array(encoding, time_base, buffer) -> None
+
+        Passes buffer of decoded events and updates state of the encoder.
+
+        :param encoding: Encoding string (e.g. "evt3") as provided by the message.
+        :type encoding: str
+        :param time_base: Time base as provided by the message. Some codecs use it to
+                          compute time stamps.
+        :type time_base: int
+        :param buffer: Buffer with encoded events to be processed, as provided by the message.
+        :type buffer: numpy array of dtype np.uint8_t
 )pbdoc")
     .def("get_cd_events", &Decoder::get_cd_events, R"pbdoc(
         get_cd_events() -> numpy.ndarray['EventCD']

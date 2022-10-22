@@ -20,7 +20,7 @@
 
 struct EventCD
 {
-  EventCD(uint16_t xa = 0, uint16_t ya = 0, int8_t pa = 0, int32_t ta = 0)
+  explicit EventCD(uint16_t xa = 0, uint16_t ya = 0, int8_t pa = 0, int32_t ta = 0)
   : x(xa), y(ya), p(pa), t(ta)
   {
   }

@@ -36,7 +36,8 @@ public:
   void finished() override {}
   void rawData(const char *, size_t) override {}
   // own methods
-  void decode(const std::string & encoding, uint64_t timeBase, pybind11::bytes);
+  void decode_bytes(const std::string & encoding, uint64_t timeBase, pybind11::bytes);
+  void decode_array(const std::string & encoding, uint64_t timeBase, pybind11::array);
   pybind11::array_t<EventCD> get_cd_events();
   pybind11::array_t<EventExtTrig> get_ext_trig_events();
 

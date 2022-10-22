@@ -18,23 +18,25 @@
 """Test decoder on data."""
 
 import argparse
-import rosbag
 import time
+import numpy as np
+from bag_reader_ros2 import BagReader
 from event_array_py import Decoder
 
 
 def test_decoder(fname, topic):
-    bag = rosbag.Bag(fname)
+    bag = BagReader(fname, topic)
     decoder = Decoder()
     t0 = time.time()
-    for topic, msg, t in bag.read_messages(topics=topic):
-        decoder.decode_bytes(msg.encoding, msg.time_base, msg.events)
+    while bag.has_next():
+        topic, msg, t_rec = bag.read_next()
+        decoder.decode_array(msg.encoding, msg.time_base,
+                             np.frombuffer(msg.events, dtype=np.uint8))
         cd_events = decoder.get_cd_events()
         print(cd_events)
         trig_events = decoder.get_ext_trig_events()
         print(trig_events)
     t1 = time.time()
-    bag.close()
     print(f"ON  events: {decoder.get_num_cd_on()}\n",
           f"OFF events: {decoder.get_num_cd_off()}")
     print(f"RISE trigger events: {decoder.get_num_trigger_rising()} ",
@@ -45,8 +47,10 @@ def test_decoder(fname, topic):
     dt = t1 - t0
     rate_cd = n_cd / dt
     rate_trig = n_trig / dt
-    print(f"Total CD events: {n_cd} in time: {dt:3f} rate: {rate_cd * 1e-6} Mevs")
-    print(f"Total trigger events: {n_trig} in time: {dt:3f} rate: {rate_trig * 1e-6} Mevs")
+    print(f"Total CD events: {n_cd} in time: {dt:3f}",
+          f" rate: {rate_cd * 1e-6} Mevs")
+    print(f"Total trigger events: {n_trig} in time: ",
+          f"{dt:3f} rate: {rate_trig * 1e-6} Mevs")
 
 
 if __name__ == '__main__':
