@@ -94,7 +94,7 @@ pybind11::array_t<EventExtTrig> Decoder::get_ext_trig_events()
 
 void Decoder::eventCD(uint64_t sensor_time, uint16_t ex, uint16_t ey, uint8_t polarity)
 {
-  cdEvents_->push_back(EventCD(ex, ey, polarity, sensor_time / 1000));
+  cdEvents_->push_back(EventCD(ex, ey, polarity, sensor_time));
   maxSizeCD_ = std::max(cdEvents_->size(), maxSizeCD_);
   numCDEvents_[std::min(polarity, uint8_t(1))]++;
 }
