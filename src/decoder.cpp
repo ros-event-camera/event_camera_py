@@ -23,9 +23,12 @@
 
 Decoder::Decoder() {}
 
-void Decoder::decode_bytes(const std::string & encoding, uint64_t timeBase, pybind11::bytes events)
+void Decoder::decode_bytes(
+  const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
+  pybind11::bytes events)
 {
-  auto decoder = decoderFactory_.getInstance(encoding);
+  auto decoder = decoderFactory_.getInstance(encoding, width, height);
+
   if (decoder) {
     decoder->setTimeBase(timeBase);
     decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
@@ -46,13 +49,15 @@ void Decoder::decode_bytes(const std::string & encoding, uint64_t timeBase, pybi
   }
 }
 
-void Decoder::decode_array(const std::string & encoding, uint64_t timeBase, pybind11::array events)
+void Decoder::decode_array(
+  const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
+  pybind11::array events)
 {
   if (events.ndim() != 1 || !pybind11::isinstance<pybind11::array_t<uint8_t>>(events)) {
     throw std::runtime_error("Input events must be 1-D numpy array of type uint8");
   }
 
-  auto decoder = decoderFactory_.getInstance(encoding);
+  auto decoder = decoderFactory_.getInstance(encoding, width, height);
   if (decoder) {
     decoder->setTimeBase(timeBase);
     decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
@@ -129,18 +134,22 @@ PYBIND11_MODULE(_event_array_py, m)
 
         decoder = Decoder()
         for msg in msgs:
-            decoder.decode(msg.encoding, msg.time_base, msg.events)
+            decoder.decode(msg.encoding, msg.width, msg.height, msg.time_base, msg.events)
             cd_events = decoder.get_cd_events()
             trig_events = decoder.get_ext_trig_events()
 )pbdoc")
     .def(pybind11::init<>())
     .def("decode_bytes", &Decoder::decode_bytes, R"pbdoc(
-        decode_bytes(encoding, time_base, buffer) -> None
+        decode_bytes(encoding, width, height, time_base, buffer) -> None
 
         Processes buffer of encoded events and updates state of the decoder.
 
         :param encoding: Encoding string (e.g. "evt3") as provided by the message.
         :type encoding: str
+        :param width: sensor width in pixels
+        :type width: int
+        :param height: sensor height in pixels
+        :type height: int
         :param time_base: Time base as provided by the message. Some codecs use it to
                           compute time stamps.
         :type time_base: int
@@ -148,12 +157,16 @@ PYBIND11_MODULE(_event_array_py, m)
         :type buffer: bytes
 )pbdoc")
     .def("decode_array", &Decoder::decode_array, R"pbdoc(
-        decode_array(encoding, time_base, buffer) -> None
+        decode_array(encoding, width, height, time_base, buffer) -> None
 
         Processes buffer of encoded events and updates state of the decoder.
 
         :param encoding: Encoding string (e.g. "evt3") as provided by the message.
         :type encoding: str
+        :param width: sensor width in pixels
+        :type width: int
+        :param height: sensor height in pixels
+        :type height: int
         :param time_base: Time base as provided by the message. Some codecs use it to
                           compute time stamps.
         :type time_base: int

@@ -28,7 +28,8 @@ def test_decoder(fname, topic):
     decoder = Decoder()
     t0 = time.time()
     for topic, msg, t in bag.read_messages(topics=topic):
-        decoder.decode_bytes(msg.encoding, msg.time_base, msg.events)
+        decoder.decode_bytes(msg.encoding, msg.width, msg.height,
+                             msg.time_base, msg.events)
         cd_events = decoder.get_cd_events()
         print(cd_events)
         trig_events = decoder.get_ext_trig_events()
@@ -46,7 +47,8 @@ def test_decoder(fname, topic):
     rate_cd = n_cd / dt
     rate_trig = n_trig / dt
     print(f"Total CD events: {n_cd} in time: {dt:3f} rate: {rate_cd * 1e-6} Mevs")
-    print(f"Total trigger events: {n_trig} in time: {dt:3f} rate: {rate_trig * 1e-6} Mevs")
+    print(f"Total trigger events: {n_trig} in time: {dt:3f}",
+          f" rate: {rate_trig * 1e-6} Mevs")
 
 
 if __name__ == '__main__':

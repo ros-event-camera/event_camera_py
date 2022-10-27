@@ -30,7 +30,8 @@ def test_decoder(fname, topic):
     t0 = time.time()
     while bag.has_next():
         topic, msg, t_rec = bag.read_next()
-        decoder.decode_array(msg.encoding, msg.time_base,
+        decoder.decode_array(msg.encoding, msg.width, msg.height,
+                             msg.time_base,
                              np.frombuffer(msg.events, dtype=np.uint8))
         cd_events = decoder.get_cd_events()
         print(cd_events)

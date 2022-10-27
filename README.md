@@ -50,7 +50,8 @@ bag = rosbag.Bag('foo.bag')
 decoder = Decoder()
 
 for topic, msg, t in bag.read_messages(topics=topic):
-    decoder.decode_bytes(msg.encoding, msg.time_base, msg.events)
+    decoder.decode_bytes(msg.encoding, msg.width, msg.height,
+	                     msg.time_base, msg.events)
     cd_events = decoder.get_cd_events()
     print(cd_events)
     trig_events = decoder.get_ext_trig_events()
@@ -69,7 +70,8 @@ decoder = Decoder()
 
 while bag.has_next():
         topic, msg, t_rec = bag.read_next()
-        decoder.decode_array(msg.encoding, msg.time_base,
+        decoder.decode_array(msg.encoding, msg.width, msg.height,
+                             msg.time_base,
                              np.frombuffer(msg.events, dtype=np.uint8))
         cd_events = decoder.get_cd_events()
         print(cd_events)
