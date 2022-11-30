@@ -82,6 +82,37 @@ while bag.has_next():
 The returned event arrays are structured numpy ndarrays that are
 compatible with Prophesee's Metavision SDK.
 
+## About timestamps
+
+A message in a recorded rosbag has three sources of time information:
+
+1) The recording timestamp. This is when the message was written into
+the bag by the rosbag recorder.
+2) The message time stamp in the header (header.stamp). This is the
+time when the ROS driver host received the first event packet from the SDK
+for that ROS message. Remember that a ROS message can contain multiple
+SDK packets, but the header.stamp refers to the first SDK packet
+received.
+3) The sensor time encoded in the packets. This time stamp depends on
+the encoding. For 'evt3' encoding the raw packet needs to be decoded
+to obtain the sensor time. The encoded sensor time has two quirks: it
+wraps around every 2^24 usec (16.77 sec) and it has bit noise errors.
+The decoder used by the ``event_array_py`` packet keeps track of the
+wrap around and tries to correct the bit errors. But if you start
+decoding from the middle of the event stream your sensor time stamps
+will start at somewhere between 0 and 16.77s due to the wrap
+around, i.e. sensor time depends on where you start decoding in the
+message stream.
+
+The time 't' column in the python array returned by ``get_cd_events()``
+is the sensor time 3), in micro seconds. The host time can be
+obtained by suitably combining the sensor time 3) with the ROS header
+stamp 2). The most naive way is to compute the time difference between
+sensor time and header stamp for the first packet and subsequently
+use that difference to obtain host time from sensor time. Obviously
+this will not account for drift between sensor and host clocks.
+
+
 ## License
 
 This software is issued under the Apache License Version 2.0.
