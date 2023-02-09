@@ -26,8 +26,7 @@ find_package(ament_cmake_python REQUIRED)
 set(ROS2_DEPENDENCIES
   "pybind11_vendor"
   "event_array_msgs"
-  "event_array_codecs"
-  )
+  "event_array_codecs")
 
 foreach(pkg ${ROS2_DEPENDENCIES})
   find_package(${pkg} REQUIRED)
@@ -43,13 +42,13 @@ find_package(pybind11)
 pybind11_add_module(_event_array_py SHARED src/decoder.cpp)
 ament_target_dependencies(_event_array_py PUBLIC event_array_codecs pybind11)
 
-ament_python_install_module(../src/${PROJECT_NAME})
+#ament_python_install_module(${PROJECT_NAME})
+ament_python_install_package(${PROJECT_NAME})
 
 target_include_directories(_event_array_py
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-  )
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(TARGETS
   _event_array_py
@@ -66,6 +65,7 @@ if(BUILD_TESTING)
   find_package(ament_cmake_lint_cmake REQUIRED)
   find_package(ament_cmake_pep257 REQUIRED)
   find_package(ament_cmake_xmllint REQUIRED)
+  find_package(ament_cmake_pytest REQUIRED)
 
   ament_copyright()
   ament_cppcheck(LANGUAGE c++)
@@ -75,6 +75,20 @@ if(BUILD_TESTING)
   ament_lint_cmake()
   ament_pep257()
   ament_xmllint()
+
+  set(_pytest_tests
+    tests/test_ros2_1.py
+    # Add other test files here
+  )
+  foreach(_test_path ${_pytest_tests})
+    get_filename_component(_test_name ${_test_path} NAME_WE)
+    ament_add_pytest_test(${_test_name} ${_test_path}
+      APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}
+      TIMEOUT 60
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+  endforeach()
+
 endif()
 
 ament_package()

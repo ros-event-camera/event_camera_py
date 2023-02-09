@@ -22,25 +22,31 @@ add_definitions(-DUSING_ROS_1)
 find_package(catkin REQUIRED COMPONENTS
   pybind11_catkin
   event_array_msgs
-  event_array_codecs
-  )
+  event_array_codecs)
 
 catkin_package(
     LIBRARIES
-    CATKIN_DEPENDS pybind11_catkin
-)
+    CATKIN_DEPENDS pybind11_catkin)
 
 include_directories(
   include
-  ${catkin_INCLUDE_DIRS}
-  )
+  ${catkin_INCLUDE_DIRS})
 
 pybind_add_module(_event_array_py MODULE src/decoder.cpp)
 
-
 install(TARGETS
   _event_array_py
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(FILES
+  tests/test_events_ros1_1.bag
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data)
+
+if(CATKIN_ENABLE_TESTING)
+  catkin_add_nosetests(tests/test_ros1_1.py
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    DEPENDENCIES
+    ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+endif()
 
 catkin_python_setup()

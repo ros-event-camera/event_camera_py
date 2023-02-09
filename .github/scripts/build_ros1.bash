@@ -18,7 +18,7 @@ done
 # run wstool to bring in the additional repositories required
 wstool init src ./src/${pkg}/${pkg}.rosinstall
 
-# build
+# build and test
 catkin config -DCMAKE_BUILD_TYPE=RelWithDebInfo
-catkin build
+catkin build && catkin test
 
