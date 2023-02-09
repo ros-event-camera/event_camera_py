@@ -46,7 +46,7 @@ void Decoder::decode_bytes(
 
 void Decoder::decode_array(
   const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
-  pybind11::array events)
+  pybind11::array_t<uint8_t> events)
 {
   if (events.ndim() != 1 || !pybind11::isinstance<pybind11::array_t<uint8_t>>(events)) {
     throw std::runtime_error("Input events must be 1-D numpy array of type uint8");

@@ -64,9 +64,8 @@ def test_readbag():
     sum_time = 0
     while bag.has_next():
         topic, msg, t_rec = bag.read_next()
-        decoder.decode_array(msg.encoding, msg.width, msg.height,
-                             msg.time_base,
-                             np.frombuffer(msg.events, dtype=np.uint8))
+        decoder.decode_bytes(msg.encoding, msg.width, msg.height,
+                             msg.time_base, msg.events.tobytes())
         cd_events = decoder.get_cd_events()
         trig_events = decoder.get_ext_trig_events()
         if cd_events.shape[0] > 0:
