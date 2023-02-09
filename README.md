@@ -60,7 +60,6 @@ for topic, msg, t in bag.read_messages(topics=topic):
 Here is a sample code for ROS2. It uses a helper class "BagReader"
 that you can find in the ``src`` folder. Note the conversion to numpy array:
 ```
-import numpy as np
 from bag_reader_ros2 import BagReader
 from event_array_py import Decoder
 
@@ -70,9 +69,8 @@ decoder = Decoder()
 
 while bag.has_next():
         topic, msg, t_rec = bag.read_next()
-        decoder.decode_array(msg.encoding, msg.width, msg.height,
-                             msg.time_base,
-                             np.frombuffer(msg.events, dtype=np.uint8))
+        decoder.decode_bytes(msg.encoding, msg.width, msg.height,
+                             msg.time_base, msg.events.tobytes())
         cd_events = decoder.get_cd_events()
         print(cd_events)
         trig_events = decoder.get_ext_trig_events()
