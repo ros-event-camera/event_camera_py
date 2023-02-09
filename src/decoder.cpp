@@ -32,7 +32,7 @@ void Decoder::decode_bytes(
   if (decoder) {
     decoder->setTimeBase(timeBase);
     decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
-    const size_t bufSize = PyByteArray_GET_SIZE(events.ptr());
+    const size_t bufSize = PyBytes_Size(events.ptr());
     // for some reason this returns a bad pointer
     // const uint8_t *buf = reinterpret_cast<uint8_t *>(PyByteArray_AsString(events.ptr()));
     // TODO(Bernd): avoid the memory copy here
