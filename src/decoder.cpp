@@ -32,11 +32,6 @@ void Decoder::decode_bytes(
   if (decoder) {
     decoder->setTimeBase(timeBase);
     decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
-    const size_t bufSize = PyBytes_Size(events.ptr());
-    // for some reason this returns a bad pointer
-    // const uint8_t *buf = reinterpret_cast<uint8_t *>(PyByteArray_AsString(events.ptr()));
-    // TODO(Bernd): avoid the memory copy here
-    const std::string foo(events);  // creates unnecessary copy!
     delete cdEvents_;               // in case events have not been picked up
     cdEvents_ = new std::vector<EventCD>();
     delete extTrigEvents_;  // in case events have not been picked up
@@ -44,8 +39,8 @@ void Decoder::decode_bytes(
     // TODO(Bernd): use hack here to avoid initializing the memory
     cdEvents_->reserve(maxSizeCD_);
     extTrigEvents_->reserve(maxSizeExtTrig_);
-    const uint8_t * buf = reinterpret_cast<const uint8_t *>(&foo[0]);
-    decoder->decode(buf, bufSize, this);
+    const uint8_t * buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(events.ptr()));
+    decoder->decode(buf, PyBytes_Size(events.ptr()), this);
   }
 }
 
