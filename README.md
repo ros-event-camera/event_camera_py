@@ -10,6 +10,7 @@ under ROS and ROS2 with python. These messages are produced by the
 Currently tested on Ubuntu 20.04 under ROS Noetic and ROS2 Galactic.
 
 ## How to build
+
 Create a workspace (``event_array_py_ws``), clone this repo, and use ``wstool``
 to pull in the remaining dependencies:
 
@@ -22,6 +23,11 @@ wstool init src src/${pkg}/${pkg}.rosinstall
 # to update an existing space:
 # wstool merge -t src src/${pkg}/${pkg}.rosinstall
 # wstool update -t src
+```
+### Install system dependencies
+You will probably be missing the ``pybind11_catkin package``:
+```
+sudo apt-get install ros-${ROS_DISTRO}-pybind11-catkin
 ```
 
 ### configure and build on ROS1:
