@@ -12,7 +12,7 @@ on:
     branches: [ master]
 
 jobs:
-  build_focal_ros1:
+  build_focal_noetic:
     runs-on: ubuntu-20.04
     name: build under ROS1 noetic on focal (x86_64)
     container:
@@ -26,27 +26,24 @@ jobs:
       - name: compile from source
         run: ./src/event_array_py/.github/scripts/build_ros1.bash
 
-  build_jetson_bionic_noetic:
-    runs-on: ubuntu-18.04
-    name: build under ROS1 noetic on bionic (jetson armv7).
-    steps:
-      - uses: actions/checkout@v3
-        name: check out github repo
-        with:
-          path: src/event_array_py
-          fetch-depth: 0
-      - uses: berndpfrommer/run-on-arch-action@master
-        name: compile from source
-        with:
-          arch: jetson_r34
-          distro: noetic_metavision
-          run:  |
-            ./src/event_array_py/.github/scripts/build_ros1.bash
-  build_focal_ros2:
+  build_focal_galactic:
     runs-on: ubuntu-20.04
     container:
       image: berndpfrommer/focal_noetic_galactic_metavision
     name: build under ROS2 on focal (x86_64)
+    steps:
+      - name: check out github repo
+        uses: actions/checkout@v3
+        with:
+          path: src/event_array_py
+          fetch-depth: 0
+      - name: compile from source
+        run: ./src/event_array_py/.github/scripts/build_ros2.bash
+  build_jammy_humble:
+    runs-on: ubuntu-22.04
+    container:
+      image: berndpfrommer/jammy_humble
+    name: build under ROS2 humble on Jammy (x86_64)
     steps:
       - name: check out github repo
         uses: actions/checkout@v3
