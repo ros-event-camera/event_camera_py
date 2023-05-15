@@ -22,6 +22,8 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
 find_package(ament_cmake_python REQUIRED)
+# to avoid unknown command python3_add_library on Ubuntu 22.04
+find_package(Python3 COMPONENTS Interpreter Development)
 
 set(ROS2_DEPENDENCIES
   "pybind11_vendor"
