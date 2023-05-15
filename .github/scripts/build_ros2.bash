@@ -15,7 +15,7 @@ done
 
 echo "found ros version: ${ROS_VERSION} distro: ${ROS_DISTRO}"
 
-# run wstool to bring in the additional repositories required
+# run vcs tool to bring in the additional repositories required
 cd src
 vcs import < ${pkg}/${pkg}.repos
 cd ..
