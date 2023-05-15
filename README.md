@@ -22,6 +22,11 @@ cd src
 vcs import < ${pkg}/${pkg}.repos
 cd ..
 ```
+### Install system dependencies
+You will probably be missing the ``pybind11_catkin package``:
+```
+sudo apt-get install ros-${ROS_DISTRO}-pybind11-catkin
+```
 
 ### configure and build on ROS1:
 
