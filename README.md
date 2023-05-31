@@ -8,8 +8,11 @@ under ROS and ROS2 with python. These messages are produced by the
 package is used.
 
 With this repository you can quickly load events from a ROS/ROS2 bag
-into your python code. The decoder will return a structured numpy array of the same format that the Metavision SDK uses, i.e.
-``dtype={'names':['x','y','p','t'], 'formats':['<u2','<u2','i1','<i4']``. To access e.g. the timestamps (in microseconds) you would use ``foo['t']``, where ``foo`` is the numpy array returned by the decoder. See sample code below.
+into your python code. The decoder will return a structured numpy array of the same format that the Metavision SDK uses:
+```python
+dtype={'names':['x','y','p','t'], 'formats':['<u2','<u2','i1','<i4'], 'offsets':[0,2,4,8], 'itemsize':12})]
+```
+To access e.g. the timestamps (in microseconds) you would use ``foo['t']``, where ``foo`` is the numpy array returned by the decoder. See sample code below.
 
 ## Supported platforms
 
