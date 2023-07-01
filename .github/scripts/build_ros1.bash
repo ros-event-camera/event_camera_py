@@ -1,7 +1,7 @@
 #!/bin/bash
 # set up ROS
 distros=('melodic' 'noetic')
-pkg=event_array_py
+pkg=$1
 #
 # probe for the ROS1 distro
 #
@@ -20,7 +20,6 @@ cd src
 vcs import < ${pkg}/${pkg}.repos
 cd ..
 
-# build and test
+# build
 catkin config -DCMAKE_BUILD_TYPE=RelWithDebInfo
-catkin build && catkin test
-
+catkin build

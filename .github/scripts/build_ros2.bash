@@ -1,7 +1,7 @@
 #!/bin/bash
 # set up ROS
 distros=('foxy' 'galactic' 'humble')
-pkg=event_array_py
+pkg=$1
 #
 # probe for the ROS2 distro
 #

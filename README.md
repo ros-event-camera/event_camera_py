@@ -1,10 +1,10 @@
 # event_array_py
 
 This repository holds ROS/ROS2 tools for processing
-[event_array_msgs](https://github.com/berndpfrommer/event_array_msgs)
+[event_array_msgs](https://github.com/ros-event-camera/event_array_msgs)
 under ROS and ROS2 with python. These messages are produced by the
-[metavision_ros_driver](https://github.com/berndpfrommer/metavision_ros_driver). For decoding, the
-[event_array_codecs](https://github.com/berndpfrommer/event_array_codecs)
+[metavision_ros_driver](https://github.com/ros-event-camera/metavision_ros_driver). For decoding, the
+[event_array_codecs](https://github.com/ros-event-camera/event_array_codecs)
 package is used.
 
 With this repository you can quickly load events from a ROS/ROS2 bag
@@ -20,14 +20,14 @@ Currently tested on Ubuntu 20.04 under ROS Noetic and ROS2 Galactic
 and on Ubuntu 22.04 under ROS2 Humble.
 
 ## How to build
-Create a workspace (``event_array_py_ws``), clone this repo, and use ``vcs``
+Create a workspace, clone this repo, and use ``vcs``
 to pull in the remaining dependencies:
 
 ```
 pkg=event_array_py
 mkdir -p ~/${pkg}_ws/src
 cd ~/${pkg}_ws
-git clone https://github.com/berndpfrommer/${pkg}.git src/${pkg}
+git clone https://github.com/ros-event-camera/${pkg}.git src/${pkg}
 cd src
 vcs import < ${pkg}/${pkg}.repos
 cd ..
