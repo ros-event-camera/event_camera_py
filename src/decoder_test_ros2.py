@@ -20,7 +20,7 @@
 import argparse
 import time
 from bag_reader_ros2 import BagReader
-from event_array_py import Decoder
+from event_camera_py import Decoder
 
 
 def test_decoder(fname, topic):

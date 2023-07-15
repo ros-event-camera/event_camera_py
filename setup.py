@@ -19,7 +19,7 @@
 from setuptools import setup
 import os
 
-package_name = 'event_array_py'
+package_name = 'event_camera_py'
 ROS_VERSION = int(os.environ['ROS_VERSION'])
 
 if ROS_VERSION == 1:
@@ -44,7 +44,7 @@ elif ROS_VERSION == 2:
         zip_safe=True,
         maintainer='Bernd Pfrommer',
         maintainer_email='bernd.pfrommer@gmail.com',
-        description='Python access for event_array_msgs',
+        description='Python access for event_camera_msgs',
         license='Apache License 2.0',
         tests_require=['pytest'],
         entry_points={

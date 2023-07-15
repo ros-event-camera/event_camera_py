@@ -16,7 +16,7 @@
 
 from rclpy.serialization import deserialize_message
 from rosidl_runtime_py.utilities import get_message
-from event_array_py import Decoder
+from event_camera_py import Decoder
 import numpy as np
 import rosbag2_py
 
