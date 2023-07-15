@@ -51,7 +51,7 @@ public:
   size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
 
 private:
-  event_camera_codecs::DecoderFactory<event_camera_msgs::msg::EventPacket, Decoder> decoderFactory_;
+  event_camera_codecs::DecoderFactory<event_camera_codecs::EventPacket, Decoder> decoderFactory_;
   size_t numCDEvents_[2] = {0, 0};
   size_t numExtTrigEvents_[2] = {0, 0};
   std::vector<EventCD> * cdEvents_{0};
