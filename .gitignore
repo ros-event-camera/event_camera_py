@@ -1,4 +1,4 @@
 src/__pycache__/
-event_array_py/__pycache__/
+event_camera_py/__pycache__/
 tests/__pycache__/
-event_array_py/_event_array_py.cpython*
+event_camera_py/_event_camera_py.cpython*

@@ -16,7 +16,7 @@
 
 import rosbag
 import numpy as np
-from event_array_py import Decoder
+from event_camera_py import Decoder
 
 
 def test_readbag():

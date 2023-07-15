@@ -13,16 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EVENT_ARRAY_PY__EVENT_EXT_TRIG_H_
-#define EVENT_ARRAY_PY__EVENT_EXT_TRIG_H_
+#ifndef EVENT_CAMERA_PY__EVENT_CD_H_
+#define EVENT_CAMERA_PY__EVENT_CD_H_
 
 #include <cstdint>
 
-struct EventExtTrig
+struct EventCD
 {
-  explicit EventExtTrig(int16_t e = 0, int64_t ta = 0, int16_t ida = 0) : p(e), t(ta), id(ida) {}
-  int16_t p;   // edge (rising or faling)
-  int64_t t;   // time stamp
-  int16_t id;  // source of trigger signal
+  explicit EventCD(uint16_t xa = 0, uint16_t ya = 0, int8_t pa = 0, int32_t ta = 0)
+  : x(xa), y(ya), p(pa), t(ta)
+  {
+  }
+  uint16_t x;
+  uint16_t y;
+  int8_t p;
+  int32_t t;
 };
-#endif  // EVENT_ARRAY_PY__EVENT_EXT_TRIG_H_
+#endif  // EVENT_CAMERA_PY__EVENT_CD_H_

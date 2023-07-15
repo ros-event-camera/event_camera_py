@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>event_array_py</name>
+  <name>event_camera_py</name>
   <version>1.0.0</version>
-  <description>Python access for event_array_msgs.</description>
+  <description>Python access for event_camera_msgs.</description>
   <maintainer email="bernd.pfrommer@gmail.com">Bernd Pfrommer</maintainer>
   <license>Apache License 2.0</license>
   <author email="bernd.pfrommer@gmail.com">Bernd Pfrommer</author>
@@ -28,8 +28,8 @@
   <exec_depend condition="$ROS_VERSION == 1">pybind11_catkin</exec_depend>
 
   <!-- common ROS1/ROS2 dependencies -->
-  <depend>event_array_msgs</depend>
-  <depend>event_array_codecs</depend>
+  <depend>event_camera_msgs</depend>
+  <depend>event_camera_codecs</depend>
 
   <export>
     <!-- this is crucial else the package will not be registered! -->

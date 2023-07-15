@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <event_array_codecs/decoder.h>
-#include <event_array_py/decoder.h>
+#include <event_camera_codecs/decoder.h>
+#include <event_camera_py/decoder.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
@@ -107,12 +107,12 @@ void Decoder::eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id)
   numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
 }
 
-PYBIND11_MODULE(_event_array_py, m)
+PYBIND11_MODULE(_event_camera_py, m)
 {
   pybind11::options options;
   options.disable_function_signatures();
   m.doc() = R"pbdoc(
-        Plugin for processing event_array_msgs in python
+        Plugin for processing event_camera_msgs in python
     )pbdoc";
 
   PYBIND11_NUMPY_DTYPE(EventCD, x, y, p, t);
@@ -121,7 +121,7 @@ PYBIND11_MODULE(_event_array_py, m)
   pybind11::class_<Decoder>(
     m, "Decoder",
     R"pbdoc(
-        Class to decode event_array_msgs in python. The decoder
+        Class to decode event_camera_msgs in python. The decoder
         keeps state inbetween calls to decode(). After calling decode()
         the events must be read via get_cd_events() before calling
         decode() again.

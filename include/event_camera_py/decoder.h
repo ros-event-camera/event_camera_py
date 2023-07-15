@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EVENT_ARRAY_PY__DECODER_H_
-#define EVENT_ARRAY_PY__DECODER_H_
+#ifndef EVENT_CAMERA_PY__DECODER_H_
+#define EVENT_CAMERA_PY__DECODER_H_
 
-#include <event_array_codecs/decoder.h>
-#include <event_array_codecs/decoder_factory.h>
-#include <event_array_py/event_cd.h>
-#include <event_array_py/event_ext_trig.h>
+#include <event_camera_codecs/decoder.h>
+#include <event_camera_codecs/decoder_factory.h>
+#include <event_camera_py/event_cd.h>
+#include <event_camera_py/event_ext_trig.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
 #include <string>
 #include <vector>
 
-class Decoder : public event_array_codecs::EventProcessor
+class Decoder : public event_camera_codecs::EventProcessor
 {
 public:
   Decoder();
@@ -51,7 +51,7 @@ public:
   size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
 
 private:
-  event_array_codecs::DecoderFactory<Decoder> decoderFactory_;
+  event_camera_codecs::DecoderFactory<event_camera_codecs::EventPacket, Decoder> decoderFactory_;
   size_t numCDEvents_[2] = {0, 0};
   size_t numExtTrigEvents_[2] = {0, 0};
   std::vector<EventCD> * cdEvents_{0};
@@ -60,4 +60,4 @@ private:
   size_t maxSizeExtTrig_{0};
 };
 
-#endif  // EVENT_ARRAY_PY__DECODER_H_
+#endif  // EVENT_CAMERA_PY__DECODER_H_

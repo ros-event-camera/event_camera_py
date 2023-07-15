@@ -27,8 +27,8 @@ find_package(Python3 COMPONENTS Interpreter Development)
 
 set(ROS2_DEPENDENCIES
   "pybind11_vendor"
-  "event_array_msgs"
-  "event_array_codecs")
+  "event_camera_msgs"
+  "event_camera_codecs")
 
 foreach(pkg ${ROS2_DEPENDENCIES})
   find_package(${pkg} REQUIRED)
@@ -41,19 +41,19 @@ find_package(pybind11)
 
 # -------- conversion tools
 
-pybind11_add_module(_event_array_py SHARED src/decoder.cpp)
-ament_target_dependencies(_event_array_py PUBLIC event_array_codecs pybind11)
+pybind11_add_module(_event_camera_py SHARED src/decoder.cpp)
+ament_target_dependencies(_event_camera_py PUBLIC event_camera_codecs pybind11)
 
 #ament_python_install_module(${PROJECT_NAME})
 ament_python_install_package(${PROJECT_NAME})
 
-target_include_directories(_event_array_py
+target_include_directories(_event_camera_py
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 install(TARGETS
-  _event_array_py
+  _event_camera_py
   DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
 )
 

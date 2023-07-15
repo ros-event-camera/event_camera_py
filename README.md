@@ -1,10 +1,10 @@
-# event_array_py
+# event_camera_py
 
 This repository holds ROS/ROS2 tools for processing
-[event_array_msgs](https://github.com/ros-event-camera/event_array_msgs)
+[event_camera_msgs](https://github.com/ros-event-camera/event_camera_msgs)
 under ROS and ROS2 with python. These messages are produced by the
 [metavision_ros_driver](https://github.com/ros-event-camera/metavision_ros_driver). For decoding, the
-[event_array_codecs](https://github.com/ros-event-camera/event_array_codecs)
+[event_camera_codecs](https://github.com/ros-event-camera/event_camera_codecs)
 package is used.
 
 With this repository you can quickly load events from a ROS/ROS2 bag
@@ -24,7 +24,7 @@ Create a workspace, clone this repo, and use ``vcs``
 to pull in the remaining dependencies:
 
 ```
-pkg=event_array_py
+pkg=event_camera_py
 mkdir -p ~/${pkg}_ws/src
 cd ~/${pkg}_ws
 git clone https://github.com/ros-event-camera/${pkg}.git src/${pkg}
@@ -57,7 +57,7 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo  #
 The following sample code shows how to decode event array messages under ROS1.
 ```
 import rosbag
-from event_array_py import Decoder
+from event_camera_py import Decoder
 
 topic = '/event_camera/events'
 bag = rosbag.Bag('foo.bag')
@@ -75,7 +75,7 @@ Here is a sample code for ROS2. It uses a helper class "BagReader"
 that you can find in the ``src`` folder. Note the conversion to numpy array:
 ```
 from bag_reader_ros2 import BagReader
-from event_array_py import Decoder
+from event_camera_py import Decoder
 
 topic = '/event_camera/events'
 bag = BagReader('foo', topic)
@@ -110,7 +110,7 @@ received.
 the encoding. For standard 'evt3' encoding the raw packet needs to be decoded
 to obtain the sensor time. The encoded sensor time has two quirks: it
 wraps around every 2^24 usec (16.77 sec) and it has bit noise errors.
-The decoder used by the ``event_array_py`` packet keeps track of the
+The decoder used by the ``event_camera_py`` packet keeps track of the
 wrap around and tries to correct the bit errors. But if you start
 decoding from the middle of the event stream your sensor time stamps
 will start at somewhere between 0 and 16.77s due to the wrap

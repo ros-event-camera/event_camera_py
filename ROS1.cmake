@@ -21,8 +21,8 @@ add_definitions(-DUSING_ROS_1)
 
 find_package(catkin REQUIRED COMPONENTS
   pybind11_catkin
-  event_array_msgs
-  event_array_codecs)
+  event_camera_msgs
+  event_camera_codecs)
 
 catkin_package(
     LIBRARIES
@@ -32,10 +32,10 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS})
 
-pybind_add_module(_event_array_py MODULE src/decoder.cpp)
+pybind_add_module(_event_camera_py MODULE src/decoder.cpp)
 
 install(TARGETS
-  _event_array_py
+  _event_camera_py
   LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES
