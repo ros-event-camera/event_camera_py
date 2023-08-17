@@ -20,28 +20,34 @@
 
 #include <cstdint>
 #include <iostream>
+#include <string>
+
+template <class T>
+static T get_attr(pybind11::object msg, const std::string & name)
+{
+  if (!pybind11::hasattr(msg, name.c_str())) {
+    throw std::runtime_error("event packet has no " + name + " field");
+  }
+  return (pybind11::getattr(msg, name.c_str()).cast<T>());
+}
 
 Decoder::Decoder() {}
+
+void Decoder::decode(pybind11::object msg)
+{
+  pybind11::array_t<uint8_t> events = get_attr<pybind11::array_t<uint8_t>>(msg, "events");
+  do_full_decode(
+    get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
+    get_attr<uint32_t>(msg, "height"), get_attr<uint64_t>(msg, "time_base"), events.data(),
+    events.size());
+}
 
 void Decoder::decode_bytes(
   const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
   pybind11::bytes events)
 {
-  auto decoder = decoderFactory_.getInstance(encoding, width, height);
-
-  if (decoder) {
-    decoder->setTimeBase(timeBase);
-    decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
-    delete cdEvents_;               // in case events have not been picked up
-    cdEvents_ = new std::vector<EventCD>();
-    delete extTrigEvents_;  // in case events have not been picked up
-    extTrigEvents_ = new std::vector<EventExtTrig>();
-    // TODO(Bernd): use hack here to avoid initializing the memory
-    cdEvents_->reserve(maxSizeCD_);
-    extTrigEvents_->reserve(maxSizeExtTrig_);
-    const uint8_t * buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(events.ptr()));
-    decoder->decode(buf, PyBytes_Size(events.ptr()), this);
-  }
+  const uint8_t * buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(events.ptr()));
+  do_full_decode(encoding, width, height, timeBase, buf, PyBytes_Size(events.ptr()));
 }
 
 void Decoder::decode_array(
@@ -51,21 +57,22 @@ void Decoder::decode_array(
   if (events.ndim() != 1 || !pybind11::isinstance<pybind11::array_t<uint8_t>>(events)) {
     throw std::runtime_error("Input events must be 1-D numpy array of type uint8");
   }
+  const uint8_t * buf = reinterpret_cast<const uint8_t *>(events.data());
+  do_full_decode(encoding, width, height, timeBase, buf, events.size());
+}
 
-  auto decoder = decoderFactory_.getInstance(encoding, width, height);
-  if (decoder) {
-    decoder->setTimeBase(timeBase);
-    decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
-    delete cdEvents_;               // in case events have not been picked up
-    cdEvents_ = new std::vector<EventCD>();
-    delete extTrigEvents_;  // in case events have not been picked up
-    extTrigEvents_ = new std::vector<EventExtTrig>();
-    // TODO(Bernd): use hack here to avoid initializing the memory
-    cdEvents_->reserve(maxSizeCD_);
-    extTrigEvents_->reserve(maxSizeExtTrig_);
-    const uint8_t * buf = reinterpret_cast<const uint8_t *>(events.data());
-    decoder->decode(buf, events.size(), this);
-  }
+std::tuple<bool, uint64_t> Decoder::decode_until(pybind11::object msg, uint64_t untilTime)
+{
+  auto decoder = initialize_decoder(
+    get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
+    get_attr<uint32_t>(msg, "height"));
+  const uint64_t timeBase = get_attr<uint64_t>(msg, "time_base");
+  reset_stored_events();
+  pybind11::array_t<uint8_t> events = get_attr<pybind11::array_t<uint8_t>>(msg, "events");
+  uint64_t nextTime{0};
+  const bool reachedTimeLimit =
+    decoder->decodeUntil(events.data(), events.size(), this, untilTime, timeBase, &nextTime);
+  return (std::tuple<bool, uint64_t>({reachedTimeLimit, nextTime}));
 }
 
 pybind11::array_t<EventCD> Decoder::get_cd_events()
@@ -107,6 +114,39 @@ void Decoder::eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id)
   numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
 }
 
+void Decoder::do_full_decode(
+  const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
+  const uint8_t * buf, size_t bufSize)
+{
+  auto decoder = initialize_decoder(encoding, width, height);
+  decoder->setTimeBase(timeBase);
+
+  reset_stored_events();
+  decoder->decode(buf, bufSize, this);
+}
+
+event_camera_codecs::Decoder<event_camera_codecs::EventPacket, Decoder> *
+Decoder::initialize_decoder(const std::string & encoding, uint32_t width, uint32_t height)
+{
+  auto decoder = decoderFactory_.getInstance(encoding, width, height);
+  if (!decoder) {
+    throw(std::runtime_error("no decoder for encoding " + encoding));
+  }
+  decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
+  return (decoder);
+}
+
+void Decoder::reset_stored_events()
+{
+  delete cdEvents_;  // in case events have not been picked up
+  cdEvents_ = new std::vector<EventCD>();
+  delete extTrigEvents_;  // in case events have not been picked up
+  extTrigEvents_ = new std::vector<EventExtTrig>();
+  // TODO(Bernd): use hack here to avoid initializing the memory
+  cdEvents_->reserve(maxSizeCD_);
+  extTrigEvents_->reserve(maxSizeExtTrig_);
+}
+
 PYBIND11_MODULE(_event_camera_py, m)
 {
   pybind11::options options;
@@ -132,6 +172,15 @@ PYBIND11_MODULE(_event_camera_py, m)
             decoder.decode(msg.encoding, msg.width, msg.height, msg.time_base, msg.events)
             cd_events = decoder.get_cd_events()
             trig_events = decoder.get_ext_trig_events()
+)pbdoc")
+    .def("decode", &Decoder::decode, R"pbdoc(
+        decode(event_packet) -> None
+
+        Decode message
+
+        :param event_packet: event packet
+        :type event_packet:  event_camera_msgs/msgs/EventPacket
+
 )pbdoc")
     .def(pybind11::init<>())
     .def("decode_bytes", &Decoder::decode_bytes, R"pbdoc(
@@ -167,6 +216,21 @@ PYBIND11_MODULE(_event_camera_py, m)
         :type time_base: int
         :param buffer: Buffer with encoded events to be processed, as provided by the message.
         :type buffer: numpy array of dtype np.uint8_t
+)pbdoc")
+    .def("decode_until", &Decoder::decode_until, R"pbdoc(
+        decode_until(event_packet, until_time) -> tuple[Boolean, uint64_t]
+
+        Processes message of encoded events and updates state of the decoder, but
+        only until "until_time" is reached.
+
+        :param event_packet: event packet
+        :type event_packet:  event_camera_msgs/msgs/EventPacket
+        :param until_time: sensor time (exclusive) up to which to process
+        :type until_time: uint64_t
+
+        :return tuple with flag (true if time limit has been reached) and
+        time following time limit (only validif time limit has been reached!)
+        :rtype height: tuple[boolean, uint64_t]
 )pbdoc")
     .def("get_cd_events", &Decoder::get_cd_events, R"pbdoc(
         get_cd_events() -> numpy.ndarray['EventCD']
