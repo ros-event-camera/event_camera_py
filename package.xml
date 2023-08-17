@@ -31,6 +31,7 @@
   <depend>event_camera_msgs</depend>
   <depend>event_camera_codecs</depend>
   <depend>ros_environment</depend>
+  <test_depend>python3-numpy</test_depend>
 
   <export>
     <!-- this is crucial else the package will not be registered! -->
