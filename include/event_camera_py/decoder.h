@@ -28,48 +28,104 @@
 #include <tuple>
 #include <vector>
 
-class Decoder : public event_camera_codecs::EventProcessor
+template <class A>
+class Decoder
 {
 public:
-  Decoder();
-  // inherited from EventProcessor
-  void eventCD(uint64_t sensor_time, uint16_t ex, uint16_t ey, uint8_t polarity) override;
-  void eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override;
-  void finished() override {}
-  void rawData(const char *, size_t) override {}
-  // own methods
-  void decode(pybind11::object msg);
+  Decoder() = default;
+  void decode(pybind11::object msg)
+  {
+    pybind11::array_t<uint8_t> events = get_attr<pybind11::array_t<uint8_t>>(msg, "events");
+    do_full_decode(
+      get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
+      get_attr<uint32_t>(msg, "height"), get_attr<uint64_t>(msg, "time_base"), events.data(),
+      events.size());
+  }
+
+  std::tuple<bool, uint64_t> decode_until(pybind11::object msg, uint64_t untilTime)
+  {
+    auto decoder = initialize_decoder(
+      get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
+      get_attr<uint32_t>(msg, "height"));
+    const uint64_t timeBase = get_attr<uint64_t>(msg, "time_base");
+    accumulator_.reset_stored_events();
+    pybind11::array_t<uint8_t> events = get_attr<pybind11::array_t<uint8_t>>(msg, "events");
+    uint64_t nextTime{0};
+    const bool reachedTimeLimit = decoder->decodeUntil(
+      events.data(), events.size(), &accumulator_, untilTime, timeBase, &nextTime);
+    return (std::tuple<bool, uint64_t>({reachedTimeLimit, nextTime}));
+  }
+
   void decode_bytes(
     const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
-    pybind11::bytes events);
+    pybind11::bytes events)
+  {
+    const uint8_t * buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(events.ptr()));
+    do_full_decode(encoding, width, height, timeBase, buf, PyBytes_Size(events.ptr()));
+  }
+
   void decode_array(
     const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
-    pybind11::array_t<uint8_t>);
-  std::tuple<bool, uint64_t> decode_until(pybind11::object eventPacket, uint64_t untilTime);
+    pybind11::array_t<uint8_t> events)
+  {
+    if (events.ndim() != 1 || !pybind11::isinstance<pybind11::array_t<uint8_t>>(events)) {
+      throw std::runtime_error("Input events must be 1-D numpy array of type uint8");
+    }
+    const uint8_t * buf = reinterpret_cast<const uint8_t *>(events.data());
+    do_full_decode(encoding, width, height, timeBase, buf, events.size());
+  }
+  pybind11::array_t<EventCD> get_cd_events() { return (accumulator_.get_cd_events()); }
+  pybind11::array_t<EventExtTrig> get_ext_trig_events()
+  {
+    return (accumulator_.get_ext_trig_events());
+  };
+  pybind11::list get_cd_event_packets() { return (accumulator_.get_cd_event_packets()); }
+  pybind11::list get_ext_trig_event_packets()
+  {
+    return (accumulator_.get_ext_trig_event_packets());
+  }
 
-  pybind11::array_t<EventCD> get_cd_events();
-  pybind11::array_t<EventExtTrig> get_ext_trig_events();
-
-  size_t get_num_cd_off() const { return (numCDEvents_[0]); }
-  size_t get_num_cd_on() const { return (numCDEvents_[1]); }
-  size_t get_num_trigger_rising() const { return (numExtTrigEvents_[0]); }
-  size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
+  size_t get_num_cd_off() const { return (accumulator_.get_num_cd_off()); }
+  size_t get_num_cd_on() const { return (accumulator_.get_num_cd_on()); }
+  size_t get_num_trigger_rising() const { return (accumulator_.get_num_trigger_rising()); }
+  size_t get_num_trigger_falling() const { return (accumulator_.get_num_trigger_falling()); }
 
 private:
+  using DecoderType = event_camera_codecs::Decoder<event_camera_codecs::EventPacket, A>;
+  template <class T>
+  static T get_attr(pybind11::object msg, const std::string & name)
+  {
+    if (!pybind11::hasattr(msg, name.c_str())) {
+      throw std::runtime_error("event packet has no " + name + " field");
+    }
+    return (pybind11::getattr(msg, name.c_str()).cast<T>());
+  }
+
   void do_full_decode(
     const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
-    const uint8_t * buf, size_t bufSize);
-  event_camera_codecs::Decoder<event_camera_codecs::EventPacket, Decoder> * initialize_decoder(
-    const std::string & encoding, uint32_t width, uint32_t height);
-  void reset_stored_events();
+    const uint8_t * buf, size_t bufSize)
+  {
+    auto decoder = initialize_decoder(encoding, width, height);
+    decoder->setTimeBase(timeBase);
+
+    accumulator_.reset_stored_events();
+    decoder->decode(buf, bufSize, &accumulator_);
+  }
+
+  DecoderType * initialize_decoder(const std::string & encoding, uint32_t width, uint32_t height)
+  {
+    accumulator_.initialize(width, height);
+    auto decoder = decoderFactory_.getInstance(encoding, width, height);
+    if (!decoder) {
+      throw(std::runtime_error("no decoder for encoding " + encoding));
+    }
+    decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds
+    return (decoder);
+  }
+
   // ------------ variables
-  event_camera_codecs::DecoderFactory<event_camera_codecs::EventPacket, Decoder> decoderFactory_;
-  size_t numCDEvents_[2] = {0, 0};
-  size_t numExtTrigEvents_[2] = {0, 0};
-  std::vector<EventCD> * cdEvents_{0};
-  std::vector<EventExtTrig> * extTrigEvents_{0};
-  size_t maxSizeCD_{0};
-  size_t maxSizeExtTrig_{0};
+  event_camera_codecs::DecoderFactory<event_camera_codecs::EventPacket, A> decoderFactory_;
+  A accumulator_;
 };
 
 #endif  // EVENT_CAMERA_PY__DECODER_H_
