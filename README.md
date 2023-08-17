@@ -55,7 +55,7 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo  #
 ## Decoding event array messages
 
 The following sample code shows how to decode event array messages under ROS1.
-```
+```python
 import rosbag
 from event_camera_py import Decoder
 
@@ -73,7 +73,7 @@ for topic, msg, t in bag.read_messages(topics=topic):
 ```
 Here is a sample code for ROS2. It uses a helper class "BagReader"
 that you can find in the ``src`` folder. Note the conversion to numpy array:
-```
+```python
 from bag_reader_ros2 import BagReader
 from event_camera_py import Decoder
 
@@ -83,8 +83,7 @@ decoder = Decoder()
 
 while bag.has_next():
         topic, msg, t_rec = bag.read_next()
-        decoder.decode_bytes(msg.encoding, msg.width, msg.height,
-                             msg.time_base, msg.events.tobytes())
+        decoder.decode(msg)
         cd_events = decoder.get_cd_events()
         print(cd_events)
         trig_events = decoder.get_ext_trig_events()
