@@ -20,7 +20,7 @@ from event_camera_py import Decoder
 from event_camera_py import UniqueDecoder
 import numpy as np
 import rosbag2_py
-
+import pdb
 
 class BagReader:
     """Convenience class for reading ROS2 bags."""
@@ -98,7 +98,7 @@ class EventCounter:
     def check_count(
         self, sum_time, num_off_events, num_on_events, num_rise_trig, num_fall_trig
     ):
-        assert sum_time == sum_time
+        assert self._sum_time == sum_time
         assert self._num_off_events == num_off_events
         assert self._num_on_events == num_on_events
         assert self._num_rise_trig == num_rise_trig
@@ -108,8 +108,8 @@ class EventCounter:
         return{
                 "num_off_events": self._num_off_events,
                 "num_on_events": self._num_on_events,
-                "num_up_trig": self._num_up_trig,
-                "num_down_trig": self._num_down_trig,
+                "num_rise_trig": self._num_rise_trig,
+                "num_fall_trig": self._num_fall_trig,
                 "sum_time": self._sum_time,
                 }
 
@@ -243,7 +243,7 @@ def test_unique_until(verbose=False):
     )
 
 if __name__ == "__main__":
+    test_decode_bytes(True)
     test_decode_msg(True)
-    test_decode_array(True)
     test_decode_until(True)
     test_unique_until(True)

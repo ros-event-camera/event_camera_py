@@ -35,13 +35,28 @@ public:
   Decoder() = default;
   void decode(pybind11::object msg)
   {
-    pybind11::bytes event_bytes = get_attr<pybind11::bytes>(msg, "events");
-    const uint8_t * buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(event_bytes.ptr()));
+    const uint64_t time_base = get_attr<uint64_t>(msg, "time_base");
+    const uint32_t width = get_attr<uint64_t>(msg, "width");
+    const uint32_t height = get_attr<uint64_t>(msg, "height");
+    std::string encoding = get_attr<std::string>(msg, "encoding");
 
-    do_full_decode(
-      get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
-      get_attr<uint32_t>(msg, "height"), get_attr<uint64_t>(msg, "time_base"), buf,
-      PyBytes_Size(event_bytes.ptr()));
+    const uint8_t * buf;
+    size_t buf_size;
+
+    pybind11::bytes event_bytes = get_attr<pybind11::bytes>(msg, "events");
+    if(event_bytes.is(pybind11::none())){
+      buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(event_bytes.ptr()));
+      buf_size = PyBytes_Size(event_bytes.ptr());
+    } else {
+      // Probably in ROS2 here...
+      pybind11::tuple buffer_info = msg.attr("events").attr("buffer_info")();
+      pybind11::object buf_tmp = buffer_info[0];
+      pybind11::object buf_size_tmp = buffer_info[1];
+      buf = reinterpret_cast<const uint8_t *>(buf_tmp.cast<int>());
+      buf_size = buf_size_tmp.cast<size_t>();
+    }
+
+    do_full_decode(encoding, width, height, time_base, buf, buf_size);
   }
 
   std::tuple<bool, uint64_t> decode_until(pybind11::object msg, uint64_t untilTime)
