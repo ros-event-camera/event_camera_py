@@ -35,11 +35,13 @@ public:
   Decoder() = default;
   void decode(pybind11::object msg)
   {
-    pybind11::array_t<uint8_t> events = get_attr<pybind11::array_t<uint8_t>>(msg, "events");
+    pybind11::bytes event_bytes = get_attr<pybind11::bytes>(msg, "events");
+    const uint8_t * buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(event_bytes.ptr()));
+
     do_full_decode(
       get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
-      get_attr<uint32_t>(msg, "height"), get_attr<uint64_t>(msg, "time_base"), events.data(),
-      events.size());
+      get_attr<uint32_t>(msg, "height"), get_attr<uint64_t>(msg, "time_base"), buf,
+      PyBytes_Size(event_bytes.ptr()));
   }
 
   std::tuple<bool, uint64_t> decode_until(pybind11::object msg, uint64_t untilTime)
