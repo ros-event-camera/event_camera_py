@@ -17,6 +17,7 @@
 from rclpy.serialization import deserialize_message
 from rosidl_runtime_py.utilities import get_message
 from event_camera_py import Decoder
+from event_camera_py import UniqueDecoder
 import numpy as np
 import rosbag2_py
 
@@ -54,6 +55,18 @@ class BagReader:
         return storage_options, converter_options
 
 
+def verify_unique(packets) -> bool:
+    for p in (pp for pp in packets if pp.shape[0] > 0):
+        idx = np.stack((p["x"], p["y"]), axis=1)
+        _, c = np.unique(idx, return_counts=True, axis=0)
+        num_with_duplicates = np.count_nonzero(c > 1)
+        if num_with_duplicates > 0:
+            print("bad packet:\n", p)
+            print(f"has {num_with_duplicates} duplicates at:")
+            return False
+    return True
+
+
 class EventCounter:
     def __init__(self):
         self._num_on_events = 0
@@ -73,6 +86,14 @@ class EventCounter:
             self._num_rise_trig += np.count_nonzero(trig_events["p"] == 0)
             self._num_fall_trig += np.count_nonzero(trig_events["p"] == 1)
             self._sum_time += np.sum(trig_events["t"])
+
+    def add_cd_event_packets(self, cd_event_packets):
+        for p in cd_event_packets:
+            self.add_cd_events(p)
+
+    def add_trig_event_packets(self, trig_event_packets):
+        for p in trig_event_packets:
+            self.add_trig_events(p)
 
     def check_count(
         self, sum_time, num_off_events, num_on_events, num_rise_trig, num_fall_trig
@@ -143,7 +164,35 @@ def test_decode_until():
             counter.add_trig_events(decoder.get_ext_trig_events())
             while reachedTimeLimit and frame_time <= nextTime:
                 frame_time += frame_interval
-                print(f"frame time: {frame_time}, nextTime: {nextTime}")
+    assert frame_time == 16824708
+    counter.check_count(
+        sum_time=6024891770230,
+        num_off_events=238682,
+        num_on_events=139584,
+        num_rise_trig=18,
+        num_fall_trig=18,
+    )
+
+
+def test_unique_until():
+    topic = "/event_camera/events"
+    bag = BagReader("tests/test_events_ros2_1", topic)
+    decoder = UniqueDecoder()
+    counter = EventCounter()
+    frame_interval = 100000  # 100 usec
+    t0 = 15024708  # first sensor time in data set
+    frame_time = t0 + frame_interval
+    while bag.has_next():
+        topic, msg, t_rec = bag.read_next()
+        reachedTimeLimit = True
+        while reachedTimeLimit:
+            reachedTimeLimit, nextTime = decoder.decode_until(msg, frame_time)
+            cd_packets = decoder.get_cd_event_packets()
+            counter.add_cd_event_packets(cd_packets)
+            assert verify_unique(cd_packets)
+            counter.add_trig_event_packets(decoder.get_ext_trig_event_packets())
+            while reachedTimeLimit and frame_time <= nextTime:
+                frame_time += frame_interval
     assert frame_time == 16824708
     counter.check_count(
         sum_time=6024891770230,
