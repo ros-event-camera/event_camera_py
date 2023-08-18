@@ -25,7 +25,7 @@
 #include <string>
 
 template <typename A>
-void declare_decoder(pybind11::module_ & m, std::string typestr)
+void declare_decoder(pybind11::module & m, std::string typestr)
 {
   using MyDecoder = Decoder<A>;
   const std::string pyName = typestr + "Decoder";
