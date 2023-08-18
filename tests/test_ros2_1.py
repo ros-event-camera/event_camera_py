@@ -55,7 +55,7 @@ class BagReader:
         return storage_options, converter_options
 
 
-def verify_unique(packets: list[np.ndarray]) -> bool:
+def verify_unique(packets) -> bool:
     for p in (pp for pp in packets if pp.shape[0] > 0):
         idx = np.stack((p["x"], p["y"]), axis=1)
         _, c = np.unique(idx, return_counts=True, axis=0)
