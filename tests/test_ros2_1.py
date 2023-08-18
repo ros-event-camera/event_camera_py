@@ -26,8 +26,8 @@ class BagReader:
     """Convenience class for reading ROS2 bags."""
 
     def __init__(self, bag_name, topics):
-        bag_path = str(bag_name)
-        storage_options, converter_options = self.get_rosbag_options(bag_path)
+        self.bag_path = str(bag_name)
+        storage_options, converter_options = self.get_rosbag_options(self.bag_path)
         self.reader = rosbag2_py.SequentialReader()
         self.reader.open(storage_options, converter_options)
         topic_types = self.reader.get_all_topics_and_types()
@@ -104,10 +104,25 @@ class EventCounter:
         assert self._num_rise_trig == num_rise_trig
         assert self._num_fall_trig == num_fall_trig
 
+    def get_result_dict(self):
+        return{
+                "num_off_events": self._num_off_events,
+                "num_on_events": self._num_on_events,
+                "num_up_trig": self._num_up_trig,
+                "num_down_trig": self._num_down_trig,
+                "sum_time": self._sum_time,
+                }
 
-def test_decode_msg():
+    def print_results(self):
+        print(self.get_result_dict())
+
+
+def test_decode_msg(verbose=False):
     topic = "/event_camera/events"
     bag = BagReader("tests/test_events_ros2_1", topic)
+    if verbose:
+        print("Testing decode")
+        print("Opening bag :: "+bag.bag_path)
     decoder = Decoder()
     counter = EventCounter()
     while bag.has_next():
@@ -115,6 +130,9 @@ def test_decode_msg():
         decoder.decode(msg)
         counter.add_cd_events(decoder.get_cd_events())
         counter.add_trig_events(decoder.get_ext_trig_events())
+
+    if verbose:
+        counter.print_results()
 
     counter.check_count(
         sum_time=6024891770230,
@@ -125,9 +143,12 @@ def test_decode_msg():
     )
 
 
-def test_decode_bytes():
+def test_decode_bytes(verbose=False):
     topic = "/event_camera/events"
     bag = BagReader("tests/test_events_ros2_1", topic)
+    if verbose:
+        print("Testing decode_bytes")
+        print("Opening bag :: "+bag.bag_path)
     decoder = Decoder()
     counter = EventCounter()
     while bag.has_next():
@@ -138,6 +159,9 @@ def test_decode_bytes():
         counter.add_cd_events(decoder.get_cd_events())
         counter.add_trig_events(decoder.get_ext_trig_events())
 
+    if verbose:
+        counter.print_results()
+
     counter.check_count(
         sum_time=6024891770230,
         num_off_events=238682,
@@ -147,9 +171,12 @@ def test_decode_bytes():
     )
 
 
-def test_decode_until():
+def test_decode_until(verbose=False):
     topic = "/event_camera/events"
     bag = BagReader("tests/test_events_ros2_1", topic)
+    if verbose:
+        print("Testing decode_until")
+        print("Opening bag :: "+bag.bag_path)
     decoder = Decoder()
     counter = EventCounter()
     frame_interval = 100000  # 100 usec
@@ -164,7 +191,13 @@ def test_decode_until():
             counter.add_trig_events(decoder.get_ext_trig_events())
             while reachedTimeLimit and frame_time <= nextTime:
                 frame_time += frame_interval
+    if verbose:
+        print("frame_time :: %d" % frame_time)
     assert frame_time == 16824708
+
+    if verbose:
+        counter.print_results()
+
     counter.check_count(
         sum_time=6024891770230,
         num_off_events=238682,
@@ -174,9 +207,12 @@ def test_decode_until():
     )
 
 
-def test_unique_until():
+def test_unique_until(verbose=False):
     topic = "/event_camera/events"
     bag = BagReader("tests/test_events_ros2_1", topic)
+    if verbose:
+        print("Testing unique_until")
+        print("Opening bag :: "+bag.bag_path)
     decoder = UniqueDecoder()
     counter = EventCounter()
     frame_interval = 100000  # 100 usec
@@ -193,7 +229,11 @@ def test_unique_until():
             counter.add_trig_event_packets(decoder.get_ext_trig_event_packets())
             while reachedTimeLimit and frame_time <= nextTime:
                 frame_time += frame_interval
+    if verbose:
+        print("frame_time :: %d" % frame_time)
     assert frame_time == 16824708
+    if verbose:
+        counter.print_results()
     counter.check_count(
         sum_time=6024891770230,
         num_off_events=238682,
@@ -201,3 +241,9 @@ def test_unique_until():
         num_rise_trig=18,
         num_fall_trig=18,
     )
+
+if __name__ == "__main__":
+    test_decode_msg(True)
+    test_decode_array(True)
+    test_decode_until(True)
+    test_unique_until(True)
