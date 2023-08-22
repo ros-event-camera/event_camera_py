@@ -35,28 +35,17 @@ public:
   Decoder() = default;
   void decode(pybind11::object msg)
   {
-    const uint64_t time_base = get_attr<uint64_t>(msg, "time_base");
-    const uint32_t width = get_attr<uint64_t>(msg, "width");
-    const uint32_t height = get_attr<uint64_t>(msg, "height");
-    std::string encoding = get_attr<std::string>(msg, "encoding");
-
-    const uint8_t * buf;
-    size_t buf_size;
-
-    pybind11::bytes event_bytes = get_attr<pybind11::bytes>(msg, "events");
-    if(event_bytes.is(pybind11::none())){
-      buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(event_bytes.ptr()));
-      buf_size = PyBytes_Size(event_bytes.ptr());
-    } else {
-      // Probably in ROS2 here...
-      pybind11::tuple buffer_info = msg.attr("events").attr("buffer_info")();
-      pybind11::object buf_tmp = buffer_info[0];
-      pybind11::object buf_size_tmp = buffer_info[1];
-      buf = reinterpret_cast<const uint8_t *>(buf_tmp.cast<int>());
-      buf_size = buf_size_tmp.cast<size_t>();
+    pybind11::object eventsObj = get_attr<pybind11::object>(msg, "events");
+    Py_buffer view;
+    if (PyObject_GetBuffer(eventsObj.ptr(), &view, PyBUF_CONTIG_RO) != 0) {
+      throw std::runtime_error("cannot convert events to byte buffer");
     }
 
-    do_full_decode(encoding, width, height, time_base, buf, buf_size);
+    do_full_decode(
+      get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
+      get_attr<uint32_t>(msg, "height"), get_attr<uint64_t>(msg, "time_base"),
+      reinterpret_cast<const uint8_t *>(view.buf), view.len);
+    PyBuffer_Release(&view);
   }
 
   std::tuple<bool, uint64_t> decode_until(pybind11::object msg, uint64_t untilTime)
@@ -64,12 +53,18 @@ public:
     auto decoder = initialize_decoder(
       get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
       get_attr<uint32_t>(msg, "height"));
-    const uint64_t timeBase = get_attr<uint64_t>(msg, "time_base");
     accumulator_.reset_stored_events();
-    pybind11::array_t<uint8_t> events = get_attr<pybind11::array_t<uint8_t>>(msg, "events");
+
+    pybind11::object eventsObj = get_attr<pybind11::object>(msg, "events");
+    Py_buffer view;
+    if (PyObject_GetBuffer(eventsObj.ptr(), &view, PyBUF_CONTIG_RO) != 0) {
+      throw std::runtime_error("cannot convert events to byte buffer");
+    }
     uint64_t nextTime{0};
     const bool reachedTimeLimit = decoder->decodeUntil(
-      events.data(), events.size(), &accumulator_, untilTime, timeBase, &nextTime);
+      reinterpret_cast<const uint8_t *>(view.buf), view.len, &accumulator_, untilTime,
+      get_attr<uint64_t>(msg, "time_base"), &nextTime);
+    PyBuffer_Release(&view);
     return (std::tuple<bool, uint64_t>({reachedTimeLimit, nextTime}));
   }
 
@@ -110,12 +105,9 @@ public:
 private:
   using DecoderType = event_camera_codecs::Decoder<event_camera_codecs::EventPacket, A>;
   template <class T>
-  static T get_attr(pybind11::object msg, const std::string & name)
+  static T get_attr(pybind11::object msg, const char * name)
   {
-    if (!pybind11::hasattr(msg, name.c_str())) {
-      throw std::runtime_error("event packet has no " + name + " field");
-    }
-    return (pybind11::getattr(msg, name.c_str()).cast<T>());
+    return (pybind11::getattr(msg, name)).cast<T>();
   }
 
   void do_full_decode(

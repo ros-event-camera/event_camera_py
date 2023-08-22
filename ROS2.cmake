@@ -79,7 +79,7 @@ if(BUILD_TESTING)
   ament_xmllint()
 
   set(_pytest_tests
-    tests/test_ros2_1.py
+    tests/test_1.py
     # Add other test files here
   )
   foreach(_test_path ${_pytest_tests})
