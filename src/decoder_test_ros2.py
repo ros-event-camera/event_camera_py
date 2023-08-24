@@ -92,10 +92,7 @@ def test_unique_decoder(fname, topic):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="read and decode events from bag.")
     parser.add_argument("--bag", required=True, help="bag file to read events from")
-
-    parser.add_argument(
-        "--topic", help="ros topic to read", default="/event_camera/events"
-    )
+    parser.add_argument("--topic", help="ros topic to read", default="/event_camera/events")
     parser.add_argument("--type", default="regular", help="type (regular, unique).")
     args = parser.parse_args()
     if args.type == "unique":

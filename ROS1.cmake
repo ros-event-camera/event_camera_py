@@ -39,11 +39,12 @@ install(TARGETS
   LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(FILES
-  tests/test_events_ros1_1.bag
+  tests/test_events_1.bag
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data)
 
 if(CATKIN_ENABLE_TESTING)
-  catkin_add_nosetests(tests/test_ros1_1.py
+  catkin_add_nosetests(
+    tests/test_1.py
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     DEPENDENCIES
     ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})

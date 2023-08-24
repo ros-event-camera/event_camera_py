@@ -1,0 +1,29 @@
+rosbag2_bagfile_information:
+  compression_format: ''
+  compression_mode: ''
+  custom_data: {}
+  duration:
+    nanoseconds: 2076072832
+  files:
+  - duration:
+      nanoseconds: 2076072832
+    message_count: 517
+    path: test_events_1.db3
+    starting_time:
+      nanoseconds_since_epoch: 1675956550318916461
+  message_count: 517
+  relative_file_paths:
+  - test_events_1.db3
+  ros_distro: rosbags
+  starting_time:
+    nanoseconds_since_epoch: 1675956550318916461
+  storage_identifier: sqlite3
+  topics_with_message_count:
+  - message_count: 517
+    topic_metadata:
+      name: /event_camera/events
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: event_camera_msgs/msg/EventPacket
+      type_description_hash: RIHS01_d6fa176260b1f37e5a40845305315e150a0f18191241eb64f407442aa29844aa
+  version: 8
