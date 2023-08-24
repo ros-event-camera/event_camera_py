@@ -123,6 +123,31 @@ def test_decode_until(verbose=False):
     )
 
 
+def test_unique(verbose=False):
+    bag = BagReader("tests/test_events_1", verbose)
+    if verbose:
+        print("Testing unique")
+    decoder = UniqueDecoder()
+    counter = EventCounter()
+
+    for _, msg, _ in bag.read_messages(topics=["/event_camera/events"]):
+        decoder.decode(msg)
+        cd_packets = decoder.get_cd_event_packets()
+        counter.add_cd_event_packets(cd_packets)
+        assert test_verify.packet_is_unique(cd_packets)
+        counter.add_trig_event_packets(decoder.get_ext_trig_event_packets())
+    if verbose:
+        counter.print_results()
+
+    counter.check_count(
+        sum_time=2885601049874,
+        num_off_events=218291,
+        num_on_events=125183,
+        num_rise_trig=2078,
+        num_fall_trig=2078,
+    )
+
+
 def test_unique_until(verbose=False):
     bag = BagReader("tests/test_events_1", verbose)
     if verbose:
@@ -161,4 +186,5 @@ if __name__ == "__main__":
     test_decode_bytes(True)
     test_decode_msg(True)
     test_decode_until(True)
+    test_unique(True)
     test_unique_until(True)
