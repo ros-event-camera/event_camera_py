@@ -14,7 +14,7 @@
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_python</buildtool_depend>
   <buildtool_depend condition="$ROS_VERSION == 2">python_cmake_module</buildtool_depend>
 
-  <exec_depend condition="$ROS_VERSION == 2">pybind11_vendor</exec_depend>
+  <depend condition="$ROS_VERSION == 2">pybind11_vendor</depend>
 
   <test_depend condition="$ROS_VERSION == 2">ament_lint_auto</test_depend>
   <test_depend condition="$ROS_VERSION == 2">ament_lint_common</test_depend>
