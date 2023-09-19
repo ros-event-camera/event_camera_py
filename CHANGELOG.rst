@@ -2,8 +2,8 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2023-09-19)
+------------------
 * fix pybind11_vendor dependency in package.xml
 * Contributors: Bernd Pfrommer
 
