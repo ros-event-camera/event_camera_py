@@ -16,14 +16,16 @@ To access e.g. the timestamps (in microseconds) you would use ``foo['t']``, wher
 
 ## Supported platforms
 
-Currently tested on Ubuntu 20.04 under ROS Noetic and ROS2 Galactic
-and on Ubuntu 22.04 under ROS2 Humble.
+Currently tested on:
+
+ - Ubuntu 20.04: ROS Noetic and ROS2 Galactic
+ - Ubuntu 22.04: ROS2 Humble and ROS2 Rolling
 
 ## How to build
 Create a workspace, clone this repo, and use ``vcs``
 to pull in the remaining dependencies:
 
-```
+```bash
 pkg=event_camera_py
 mkdir -p ~/${pkg}_ws/src
 cd ~/${pkg}_ws
@@ -34,20 +36,20 @@ cd ..
 ```
 ### Install system dependencies
 You will probably be missing the ``pybind11_catkin package``:
-```
+```bash
 sudo apt-get install ros-${ROS_DISTRO}-pybind11-catkin
 ```
 
 ### configure and build on ROS1:
 
-```
+```bash
 catkin config -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
 catkin build
 ```
 
 ### configure and build on ROS2:
 
-```
+```bash
 cd ~/${pkg}_ws
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
 ```

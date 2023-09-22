@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+import os
+
 # ------- hack to work around nosetest changing the module path
 import os.path
 import sys
@@ -27,13 +29,11 @@ from event_camera_py import UniqueDecoder  # noqa: E402  (suppress flake8 error)
 from event_counter import EventCounter  # noqa: E402  (suppress flake8 error)
 import test_verify  # noqa: E402  (suppress flake8 error)
 
-is_ros2 = True
-try:
-    from bag_reader_ros1 import BagReader
-
-    is_ros2 = False
-except ImportError:
+is_ros2 = os.environ["ROS_VERSION"] == "2"
+if is_ros2:
     from bag_reader_ros2 import BagReader
+else:
+    from bag_reader_ros1 import BagReader
 
 
 def test_decode_msg(verbose=False):
