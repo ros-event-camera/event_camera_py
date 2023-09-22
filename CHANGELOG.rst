@@ -2,8 +2,8 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.3 (2023-09-22)
+------------------
 * improved README, fixed python test dependencies
 * Contributors: Bernd Pfrommer
 
