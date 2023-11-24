@@ -49,7 +49,14 @@ class EventCounter:
         for p in trig_event_packets:
             self.add_trig_events(p)
 
-    def check_count(self, sum_time, num_off_events, num_on_events, num_rise_trig, num_fall_trig):
+    def check_count(
+        self,
+        sum_time,
+        num_off_events,
+        num_on_events,
+        num_rise_trig,
+        num_fall_trig,
+    ):
         assert self._sum_time == sum_time, emsg("sum_time", self._sum_time, sum_time)
         assert self._num_off_events == num_off_events, emsg(
             "num_off_events", self._num_off_events, num_off_events

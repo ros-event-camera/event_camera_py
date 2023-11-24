@@ -19,10 +19,11 @@
 
 import argparse
 import time
+
 import numpy as np
 from bag_reader_ros2 import BagReader
-from event_camera_py import Decoder
-from event_camera_py import UniqueDecoder
+
+from event_camera_py import Decoder, UniqueDecoder
 
 
 def print_stats(decoder, t0, t1):
@@ -39,7 +40,10 @@ def print_stats(decoder, t0, t1):
     dt = t1 - t0
     rate_cd = n_cd / dt
     rate_trig = n_trig / dt
-    print(f"Total CD events: {n_cd} in time: {dt:3f}", f" rate: {rate_cd * 1e-6} Mevs")
+    print(
+        f"Total CD events: {n_cd} in time: {dt:3f}",
+        f" rate: {rate_cd * 1e-6} Mevs",
+    )
     print(
         f"Total trigger events: {n_trig} in time: ",
         f"{dt:3f} rate: {rate_trig * 1e-6} Mevs",
@@ -92,7 +96,9 @@ def test_unique_decoder(fname, topic):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="read and decode events from bag.")
     parser.add_argument("--bag", required=True, help="bag file to read events from")
-    parser.add_argument("--topic", help="ros topic to read", default="/event_camera/events")
+    parser.add_argument(
+        "--topic", help="ros topic to read", default="/event_camera/events"
+    )
     parser.add_argument("--type", default="regular", help="type (regular, unique).")
     args = parser.parse_args()
     if args.type == "unique":
