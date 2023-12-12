@@ -23,11 +23,11 @@ import sys
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 # ------- end of hack
 
+import test_verify  # noqa: E402  (suppress flake8 error)
+from event_counter import EventCounter  # noqa: E402  (suppress flake8 error)
+
 from event_camera_py import Decoder  # noqa: E402  (suppress flake8 error)
 from event_camera_py import UniqueDecoder  # noqa: E402  (suppress flake8 error)
-
-from event_counter import EventCounter  # noqa: E402  (suppress flake8 error)
-import test_verify  # noqa: E402  (suppress flake8 error)
 
 is_ros2 = os.environ["ROS_VERSION"] == "2"
 if is_ros2:

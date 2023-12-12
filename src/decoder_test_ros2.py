@@ -32,7 +32,7 @@ def print_stats(decoder, t0, t1):
         f"OFF events: {decoder.get_num_cd_off()}",
     )
     print(
-        f"RISE trigger events: {decoder.get_num_trigger_rising()} ",
+        f"RISE trigger events: {decoder.get_num_trigger_rising()}",
         f"FALL trigger events: {decoder.get_num_trigger_falling()}",
     )
     n_cd = decoder.get_num_cd_on() + decoder.get_num_cd_off()
