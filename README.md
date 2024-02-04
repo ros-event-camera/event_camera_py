@@ -108,15 +108,22 @@ for that ROS message. Remember that a ROS message can contain multiple
 SDK packets, but the header.stamp refers to the first SDK packet
 received.
 3) The sensor time encoded in the packets. This time stamp depends on
-the encoding. For standard 'evt3' encoding the raw packet needs to be decoded
-to obtain the sensor time. The encoded sensor time has two quirks: it
-wraps around every 2^24 usec (16.77 sec) and it has bit noise errors.
-The decoder used by the ``event_camera_py`` packet keeps track of the
-wrap around and tries to correct the bit errors. But if you start
-decoding from the middle of the event stream your sensor time stamps
-will start at somewhere between 0 and 16.77s due to the wrap
-around, i.e. sensor time depends on where you start decoding in the
-message stream.
+the encoding. 
+  - For 'evt3' (metavision) encoding the raw packet needs to be decoded
+    to obtain the sensor time. The encoded sensor time has two quirks: it
+    wraps around every 2^24 usec (16.77 sec) and it has bit noise errors.
+    The decoder used by the ``event_camera_py`` packet keeps track of the
+    wrap around and tries to correct the bit errors. But if you start
+    decoding from the middle of the event stream your sensor time stamps
+    will start at somewhere between 0 and 16.77s due to the wrap
+    around, i.e. sensor time depends on where you start decoding in the
+    message stream.
+  - For 'libcaer_cmp' (libcaer) encoding, the time stamps in the event
+    stream are in nanoseconds since epoch, which makes them unsuitable for
+    32 bit representation. For this reason the decoder sets the time stamp
+    of the first event to zero, and all subsequent event times are relative
+    to the first event time. The time since epoch (in usec) of the first
+    event can be obtained from the decoder via ``get_start_time()``.
 
 The time 't' column in the python array returned by ``get_cd_events()``
 is the sensor time 3), in micro seconds. The host time can be
@@ -125,6 +132,9 @@ stamp 2). The most naive way is to compute the time difference between
 sensor time and header stamp for the first packet and subsequently
 use that difference to obtain host time from sensor time. Obviously
 this will not account for drift between sensor and host clocks.
+
+Note that the event time stamps in the structured python array are represented
+by a 32bit signed integer and thus will roll over after about 35mins!
 
 
 ## License

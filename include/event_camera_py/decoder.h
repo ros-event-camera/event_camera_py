@@ -86,6 +86,7 @@ public:
     const uint8_t * buf = reinterpret_cast<const uint8_t *>(events.data());
     do_full_decode(encoding, width, height, timeBase, buf, events.size());
   }
+  uint64_t get_start_time() const { return (accumulator_.get_start_time()); }
   pybind11::array_t<EventCD> get_cd_events() { return (accumulator_.get_cd_events()); }
   pybind11::array_t<EventExtTrig> get_ext_trig_events()
   {
@@ -116,7 +117,7 @@ private:
   {
     auto decoder = initialize_decoder(encoding, width, height);
     decoder->setTimeBase(timeBase);
-
+    accumulator_.setHasSensorTimeSinceEpoch(decoder->hasSensorTimeSinceEpoch());
     accumulator_.reset_stored_events();
     decoder->decode(buf, bufSize, &accumulator_);
   }
