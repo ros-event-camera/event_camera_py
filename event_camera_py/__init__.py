@@ -18,7 +18,7 @@ try:
     # under ROS2 need to add dll dir for windows
     from rpyutils import add_dll_directories_from_env
 
-    with add_dll_directories_from_env("PATH"):
+    with add_dll_directories_from_env('PATH'):
         from event_camera_py._event_camera_py import Decoder
         from event_camera_py._event_camera_py import UniqueDecoder
 
@@ -31,4 +31,4 @@ except ImportError:
         # import under ROS1
         from _event_camera_py import Decoder
         from _event_camera_py import UniqueDecoder
-__all__ = ["Decoder", "UniqueDecoder"]
+__all__ = ['Decoder', 'UniqueDecoder']

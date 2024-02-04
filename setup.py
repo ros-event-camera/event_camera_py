@@ -16,18 +16,20 @@
 #
 #
 
-from setuptools import setup
 import os
+
+from setuptools import setup
 
 package_name = 'event_camera_py'
 ROS_VERSION = int(os.environ['ROS_VERSION'])
 
 if ROS_VERSION == 1:
     from catkin_pkg.python_setup import generate_distutils_setup
+
     # fetch values from package.xml
     setup_args = generate_distutils_setup(
         packages=[package_name],
-        package_dir={'': ''}  # location of python source is at top
+        package_dir={'': ''},  # location of python source is at top
     )
     setup(**setup_args)
 elif ROS_VERSION == 2:
@@ -36,8 +38,10 @@ elif ROS_VERSION == 2:
         version='1.0.0',
         packages=[package_name],
         data_files=[
-            ('share/ament_index/resource_index/packages',
-             ['resource/' + package_name]),
+            (
+                'share/ament_index/resource_index/packages',
+                ['resource/' + package_name],
+            ),
             ('share/' + package_name, ['package.xml']),
         ],
         install_requires=['setuptools'],
@@ -48,6 +52,6 @@ elif ROS_VERSION == 2:
         license='Apache License 2.0',
         tests_require=['pytest'],
         entry_points={
-            'console_scripts': [
-            ],
-        })
+            'console_scripts': [],
+        },
+    )

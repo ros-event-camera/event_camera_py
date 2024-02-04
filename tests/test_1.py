@@ -23,13 +23,13 @@ import sys
 sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
 # ------- end of hack
 
-from event_camera_py import Decoder  # noqa: E402  (suppress flake8 error)
-from event_camera_py import UniqueDecoder  # noqa: E402  (suppress flake8 error)
-
 from event_counter import EventCounter  # noqa: E402  (suppress flake8 error)
 import test_verify  # noqa: E402  (suppress flake8 error)
 
-is_ros2 = os.environ["ROS_VERSION"] == "2"
+from event_camera_py import Decoder  # noqa: I100, E402  (suppress flake8 error)
+from event_camera_py import UniqueDecoder  # noqa: E402  (suppress flake8 error)
+
+is_ros2 = os.environ['ROS_VERSION'] == '2'
 if is_ros2:
     from bag_reader_ros2 import BagReader
 else:
@@ -37,12 +37,12 @@ else:
 
 
 def test_decode_msg(verbose=False):
-    bag = BagReader("tests/test_events_1", verbose)
+    bag = BagReader('tests/test_events_1', verbose)
     if verbose:
-        print("Testing decode")
+        print('Testing decode')
     decoder = Decoder()
     counter = EventCounter()
-    for _, msg, _ in bag.read_messages(topics=["/event_camera/events"]):
+    for _, msg, _ in bag.read_messages(topics=['/event_camera/events']):
         decoder.decode(msg)
         counter.add_cd_events(decoder.get_cd_events())
         counter.add_trig_events(decoder.get_ext_trig_events())
@@ -60,12 +60,12 @@ def test_decode_msg(verbose=False):
 
 
 def test_decode_bytes(verbose=False):
-    bag = BagReader("tests/test_events_1", verbose)
+    bag = BagReader('tests/test_events_1', verbose)
     if verbose:
-        print("Testing decode_bytes")
+        print('Testing decode_bytes')
     decoder = Decoder()
     counter = EventCounter()
-    for _, msg, _ in bag.read_messages(topics=["/event_camera/events"]):
+    for _, msg, _ in bag.read_messages(topics=['/event_camera/events']):
         decoder.decode_bytes(
             msg.encoding,
             msg.width,
@@ -89,15 +89,15 @@ def test_decode_bytes(verbose=False):
 
 
 def test_decode_until(verbose=False):
-    bag = BagReader("tests/test_events_1", verbose)
+    bag = BagReader('tests/test_events_1', verbose)
     if verbose:
-        print("Testing decode_until")
+        print('Testing decode_until')
     decoder = Decoder()
     counter = EventCounter()
     frame_interval = 100000  # 100 usec
     t0 = 7139845  # first sensor time in data set
     frame_time = t0 + frame_interval
-    for _, msg, _ in bag.read_messages(topics=["/event_camera/events"]):
+    for _, msg, _ in bag.read_messages(topics=['/event_camera/events']):
         reachedTimeLimit = True
         while reachedTimeLimit:
             reachedTimeLimit, nextTime = decoder.decode_until(msg, frame_time)
@@ -107,9 +107,9 @@ def test_decode_until(verbose=False):
             while reachedTimeLimit and frame_time <= nextTime:
                 frame_time += frame_interval
     if verbose:
-        print("final frame_time :: %d" % frame_time)
+        print('final frame_time :: %d' % frame_time)
 
-    assert frame_time == 9239845, "bad frame time!"
+    assert frame_time == 9239845, 'bad frame time!'
 
     if verbose:
         counter.print_results()
@@ -124,13 +124,13 @@ def test_decode_until(verbose=False):
 
 
 def test_unique(verbose=False):
-    bag = BagReader("tests/test_events_1", verbose)
+    bag = BagReader('tests/test_events_1', verbose)
     if verbose:
-        print("Testing unique")
+        print('Testing unique')
     decoder = UniqueDecoder()
     counter = EventCounter()
 
-    for _, msg, _ in bag.read_messages(topics=["/event_camera/events"]):
+    for _, msg, _ in bag.read_messages(topics=['/event_camera/events']):
         decoder.decode(msg)
         cd_packets = decoder.get_cd_event_packets()
         counter.add_cd_event_packets(cd_packets)
@@ -149,15 +149,15 @@ def test_unique(verbose=False):
 
 
 def test_unique_until(verbose=False):
-    bag = BagReader("tests/test_events_1", verbose)
+    bag = BagReader('tests/test_events_1', verbose)
     if verbose:
-        print("Testing unique_until")
+        print('Testing unique_until')
     decoder = UniqueDecoder()
     counter = EventCounter()
     frame_interval = 100000  # 100 usec
     t0 = 7139845  # first sensor time in data set
     frame_time = t0 + frame_interval
-    for _, msg, _ in bag.read_messages(topics=["/event_camera/events"]):
+    for _, msg, _ in bag.read_messages(topics=['/event_camera/events']):
         reachedTimeLimit = True
         while reachedTimeLimit:
             reachedTimeLimit, nextTime = decoder.decode_until(msg, frame_time)
@@ -168,7 +168,7 @@ def test_unique_until(verbose=False):
             while reachedTimeLimit and frame_time <= nextTime:
                 frame_time += frame_interval
     if verbose:
-        print("final frame_time :: %d" % frame_time)
+        print('final frame_time :: %d' % frame_time)
     assert frame_time == 9239845
     if verbose:
         counter.print_results()
@@ -182,7 +182,7 @@ def test_unique_until(verbose=False):
     )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     test_decode_bytes(True)
     test_decode_msg(True)
     test_decode_until(True)

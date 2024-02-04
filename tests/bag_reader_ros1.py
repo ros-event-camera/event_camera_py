@@ -21,9 +21,9 @@ class BagReader:
     """Convenience class for reading ROS1 bags."""
 
     def __init__(self, bag_name, verbose=False):
-        self._bag = rosbag.Bag(bag_name + ".bag")
+        self._bag = rosbag.Bag(bag_name + '.bag')
         if verbose:
-            print("Opening bag :: " + bag_name + ".bag")
+            print('Opening bag :: ' + bag_name + '.bag')
 
     def read_messages(self, topics):
         return self._bag.read_messages(topics=topics)
