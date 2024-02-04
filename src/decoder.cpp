@@ -88,6 +88,11 @@ void declare_decoder(pybind11::module & m, std::string typestr)
         time following time limit (only validif time limit has been reached!)
         :rtype height: tuple[boolean, uint64_t]
         )pbdoc")
+    .def("get_start_time", &MyDecoder::get_start_time, R"pbdoc(
+        get_start_time() -> uint64
+        :return: start time offset for sensor time.
+        :rtype: uint64
+        )pbdoc")
     .def("get_cd_events", &MyDecoder::get_cd_events, R"pbdoc(
         get_cd_events() -> numpy.ndarray['EventCD']
 

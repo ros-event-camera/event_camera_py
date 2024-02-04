@@ -47,7 +47,7 @@ public:
     if (cdEvents_.empty()) {
       cdEvents_.push_back(new std::vector<EventCD>());
     }
-    cdEvents_.back()->push_back(EventCD(ex, ey, polarity, sensor_time));
+    cdEvents_.back()->push_back(EventCD(ex, ey, polarity, shorten_time(sensor_time)));
 
     maxSizeCD_ = std::max(cdEvents_.back()->size(), maxSizeCD_);
     numCDEvents_[std::min(polarity, uint8_t(1))]++;
@@ -132,6 +132,7 @@ public:
 
   void clearImage() { memset(image_.data(), 0, image_.size()); }
 
+  uint64_t get_start_time() const { return (startTime_); }
   pybind11::list get_cd_event_packets() { return (get_event_packets(&cdEvents_)); }
   pybind11::list get_ext_trig_event_packets() { return (get_event_packets(&extTrigEvents_)); }
 
@@ -139,9 +140,24 @@ public:
   size_t get_num_cd_on() const { return (numCDEvents_[1]); }
   size_t get_num_trigger_rising() const { return (numExtTrigEvents_[0]); }
   size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
+  void setHasSensorTimeSinceEpoch(bool b) { hasSensorTimeSinceEpoch_ = b; }
+  int32_t shorten_time(uint64_t t)
+  {
+    if (hasSensorTimeSinceEpoch_) {
+      if (!hasStartTime_) {
+        startTime_ = t;
+        hasStartTime_ = true;
+      }
+      return (static_cast<int32_t>(t - startTime_));
+    }
+    return (static_cast<int32_t>(t - startTime_));
+  }
 
 private:
   // ------------ variables
+  bool hasStartTime_{false};
+  bool hasSensorTimeSinceEpoch_{false};
+  uint64_t startTime_{0};
   size_t numCDEvents_[2] = {0, 0};
   size_t numExtTrigEvents_[2] = {0, 0};
   std::vector<std::vector<EventCD> *> cdEvents_;
