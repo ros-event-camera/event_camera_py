@@ -16,8 +16,8 @@
 #
 #
 
-import rosbag2_py
 from rclpy.serialization import deserialize_message
+import rosbag2_py
 from rosidl_runtime_py.utilities import get_message
 
 
@@ -30,9 +30,7 @@ class BagReader:
         self.reader = rosbag2_py.SequentialReader()
         self.reader.open(storage_options, converter_options)
         topic_types = self.reader.get_all_topics_and_types()
-        self.type_map = {
-            topic_types[i].name: topic_types[i].type for i in range(len(topic_types))
-        }
+        self.type_map = {topic_types[i].name: topic_types[i].type for i in range(len(topic_types))}
         storage_filter = rosbag2_py.StorageFilter(topics=[topics])
         self.reader.set_filter(storage_filter)
 
@@ -45,8 +43,8 @@ class BagReader:
         msg = deserialize_message(data, msg_type)
         return (topic, msg, t_rec)
 
-    def get_rosbag_options(self, path, serialization_format="cdr"):
-        storage_options = rosbag2_py.StorageOptions(uri=path, storage_id="sqlite3")
+    def get_rosbag_options(self, path, serialization_format='cdr'):
+        storage_options = rosbag2_py.StorageOptions(uri=path, storage_id='sqlite3')
         converter_options = rosbag2_py.ConverterOptions(
             input_serialization_format=serialization_format,
             output_serialization_format=serialization_format,

@@ -20,8 +20,8 @@ import os
 
 from setuptools import setup
 
-package_name = "event_camera_py"
-ROS_VERSION = int(os.environ["ROS_VERSION"])
+package_name = 'event_camera_py'
+ROS_VERSION = int(os.environ['ROS_VERSION'])
 
 if ROS_VERSION == 1:
     from catkin_pkg.python_setup import generate_distutils_setup
@@ -29,29 +29,29 @@ if ROS_VERSION == 1:
     # fetch values from package.xml
     setup_args = generate_distutils_setup(
         packages=[package_name],
-        package_dir={"": ""},  # location of python source is at top
+        package_dir={'': ''},  # location of python source is at top
     )
     setup(**setup_args)
 elif ROS_VERSION == 2:
     setup(
         name=package_name,
-        version="1.0.0",
+        version='1.0.0',
         packages=[package_name],
         data_files=[
             (
-                "share/ament_index/resource_index/packages",
-                ["resource/" + package_name],
+                'share/ament_index/resource_index/packages',
+                ['resource/' + package_name],
             ),
-            ("share/" + package_name, ["package.xml"]),
+            ('share/' + package_name, ['package.xml']),
         ],
-        install_requires=["setuptools"],
+        install_requires=['setuptools'],
         zip_safe=True,
-        maintainer="Bernd Pfrommer",
-        maintainer_email="bernd.pfrommer@gmail.com",
-        description="Python access for event_camera_msgs",
-        license="Apache License 2.0",
-        tests_require=["pytest"],
+        maintainer='Bernd Pfrommer',
+        maintainer_email='bernd.pfrommer@gmail.com',
+        description='Python access for event_camera_msgs',
+        license='Apache License 2.0',
+        tests_require=['pytest'],
         entry_points={
-            "console_scripts": [],
+            'console_scripts': [],
         },
     )

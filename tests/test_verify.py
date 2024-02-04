@@ -19,11 +19,11 @@ import numpy as np
 
 def packet_is_unique(packets) -> bool:
     for p in (pp for pp in packets if pp.shape[0] > 0):
-        idx = np.stack((p["x"], p["y"]), axis=1)
+        idx = np.stack((p['x'], p['y']), axis=1)
         _, c = np.unique(idx, return_counts=True, axis=0)
         num_with_duplicates = np.count_nonzero(c > 1)
         if num_with_duplicates > 0:
-            print("bad packet:\n", p)
-            print(f"has {num_with_duplicates} duplicates at:")
+            print('bad packet:\n', p)
+            print(f'has {num_with_duplicates} duplicates at:')
             return False
     return True

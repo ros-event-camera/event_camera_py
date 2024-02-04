@@ -21,8 +21,7 @@ import argparse
 import time
 
 import rosbag
-
-from event_camera_py import Decoder
+from event_camera_py import Decoder  # noqa: I100  (suppress flake8 error)
 
 
 def test_decoder(fname, topic):
@@ -30,9 +29,7 @@ def test_decoder(fname, topic):
     decoder = Decoder()
     t0 = time.time()
     for topic, msg, t in bag.read_messages(topics=topic):
-        decoder.decode_bytes(
-            msg.encoding, msg.width, msg.height, msg.time_base, msg.events
-        )
+        decoder.decode_bytes(msg.encoding, msg.width, msg.height, msg.time_base, msg.events)
         cd_events = decoder.get_cd_events()
         print(cd_events)
         trig_events = decoder.get_ext_trig_events()
@@ -40,39 +37,39 @@ def test_decoder(fname, topic):
     t1 = time.time()
     bag.close()
     print(
-        f"ON  events: {decoder.get_num_cd_on()}\n",
-        f"OFF events: {decoder.get_num_cd_off()}",
+        f'ON  events: {decoder.get_num_cd_on()}\n',
+        f'OFF events: {decoder.get_num_cd_off()}',
     )
     print(
-        f"RISE trigger events: {decoder.get_num_trigger_rising()} ",
-        f"FALL trigger events: {decoder.get_num_trigger_falling()}",
+        f'RISE trigger events: {decoder.get_num_trigger_rising()} ',
+        f'FALL trigger events: {decoder.get_num_trigger_falling()}',
     )
     n_cd = decoder.get_num_cd_on() + decoder.get_num_cd_off()
     n_trig = decoder.get_num_trigger_rising() + decoder.get_num_trigger_falling()
     dt = t1 - t0
     rate_cd = n_cd / dt
     rate_trig = n_trig / dt
-    print(f"Total CD events: {n_cd} in time: {dt:3f} rate: {rate_cd * 1e-6} Mevs")
+    print(f'Total CD events: {n_cd} in time: {dt:3f} rate: {rate_cd * 1e-6} Mevs')
     print(
-        f"Total trigger events: {n_trig} in time: {dt:3f}",
-        f" rate: {rate_trig * 1e-6} Mevs",
+        f'Total trigger events: {n_trig} in time: {dt:3f}',
+        f' rate: {rate_trig * 1e-6} Mevs',
     )
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="read and decode events from bag.")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='read and decode events from bag.')
     parser.add_argument(
-        "--bag",
-        "-b",
-        action="store",
+        '--bag',
+        '-b',
+        action='store',
         default=None,
         required=True,
-        help="bag file to read events from",
+        help='bag file to read events from',
     )
     parser.add_argument(
-        "--topic",
-        help="Event topic to read",
-        default="/event_camera/events",
+        '--topic',
+        help='Event topic to read',
+        default='/event_camera/events',
         type=str,
     )
     args = parser.parse_args()
