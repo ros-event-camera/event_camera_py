@@ -2,8 +2,8 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.4 (2024-02-04)
+------------------
 * reformat to flake8 using ruff
 * support for libcaer time stamps starting at epoch
 * Contributors: Bernd Pfrommer
