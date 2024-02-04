@@ -20,9 +20,11 @@
 import argparse
 import time
 
-import numpy as np
 from bag_reader_ros2 import BagReader
-from event_camera_py import Decoder, UniqueDecoder
+import numpy as np
+
+from event_camera_py import Decoder  # noqa: I100  (suppress flake8 error)
+from event_camera_py import UniqueDecoder
 
 
 def print_stats(decoder, t0, t1):
