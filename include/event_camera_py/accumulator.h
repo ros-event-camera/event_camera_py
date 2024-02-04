@@ -34,7 +34,7 @@ public:
   // inherited from EventProcessor
   void eventCD(uint64_t sensor_time, uint16_t ex, uint16_t ey, uint8_t polarity) override
   {
-    cdEvents_->push_back(EventCD(ex, ey, polarity, sensor_time));
+    cdEvents_->push_back(EventCD(ex, ey, polarity, shorten_time(sensor_time)));
     maxSizeCD_ = std::max(cdEvents_->size(), maxSizeCD_);
     numCDEvents_[std::min(polarity, uint8_t(1))]++;
   }
@@ -61,7 +61,7 @@ public:
     cdEvents_->reserve(maxSizeCD_);
     extTrigEvents_->reserve(maxSizeExtTrig_);
   }
-
+  uint64_t get_start_time() const { return (startTime_); }
   pybind11::array_t<EventCD> get_cd_events()
   {
     if (cdEvents_) {
@@ -93,9 +93,24 @@ public:
   size_t get_num_trigger_rising() const { return (numExtTrigEvents_[0]); }
   size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
   void initialize(uint32_t, uint32_t) {}
+  void setHasSensorTimeSinceEpoch(bool b) { hasSensorTimeSinceEpoch_ = b; }
+  int32_t shorten_time(uint64_t t)
+  {
+    if (hasSensorTimeSinceEpoch_) {
+      if (!hasStartTime_) {
+        startTime_ = t;
+        hasStartTime_ = true;
+      }
+      return (static_cast<int32_t>(t - startTime_));
+    }
+    return (static_cast<int32_t>(t - startTime_));
+  }
 
 private:
   // ------------ variables
+  bool hasStartTime_{false};
+  bool hasSensorTimeSinceEpoch_{false};
+  uint64_t startTime_{0};
   size_t numCDEvents_[2] = {0, 0};
   size_t numExtTrigEvents_[2] = {0, 0};
   std::vector<EventCD> * cdEvents_{0};
