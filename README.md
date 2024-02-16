@@ -3,8 +3,9 @@
 This repository holds ROS/ROS2 tools for processing
 [event_camera_msgs](https://github.com/ros-event-camera/event_camera_msgs)
 under ROS and ROS2 with python. These messages are produced by the
-[metavision_ros_driver](https://github.com/ros-event-camera/metavision_ros_driver). For decoding, the
-[event_camera_codecs](https://github.com/ros-event-camera/event_camera_codecs)
+[metavision_driver](https://github.com/ros-event-camera/metavision_driver) and
+the [libcaer_driver](https://github.com/ros-event-camera/libcaer_driver).
+For decoding, the [event_camera_codecs](https://github.com/ros-event-camera/event_camera_codecs)
 package is used.
 
 With this repository you can quickly load events from a ROS/ROS2 bag
@@ -16,43 +17,22 @@ To access e.g. the timestamps (in microseconds) you would use ``foo['t']``, wher
 
 ## Supported platforms
 
-Currently tested on:
+Continuous integration is tested under Ubuntu with the following ROS2 distros:
 
- - Ubuntu 20.04: ROS Noetic and ROS2 Galactic
- - Ubuntu 22.04: ROS2 Humble and ROS2 Rolling
+ [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__event_camera_py__ubuntu_jammy_amd64&subject=Humble)](https://build.ros2.org/job/Hdev__event_camera_py__ubuntu_jammy_amd64/)
+ [![Build Status](https://build.ros2.org/buildStatus/icon?job=Idev__event_camera_py__ubuntu_jammy_amd64&subject=Iron)](https://build.ros2.org/job/Idev__event_camera_py__ubuntu_jammy_amd64/)
+ [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__event_camera_py__ubuntu_jammy_amd64&subject=Rolling)](https://build.ros2.org/job/Rdev__event_camera_py__ubuntu_jammy_amd64/)
 
-## How to build
-Create a workspace, clone this repo, and use ``vcs``
-to pull in the remaining dependencies:
+No package is released for ROS1, but integration is tested under Ubuntu 20.04 and ROS Noetic.
 
+## How to download and build
+
+Set the following shell variables:
 ```bash
-pkg=event_camera_py
-mkdir -p ~/${pkg}_ws/src
-cd ~/${pkg}_ws
-git clone https://github.com/ros-event-camera/${pkg}.git src/${pkg}
-cd src
-vcs import < ${pkg}/${pkg}.repos
-cd ..
+repo=event_camera_py
+url=https://github.com/ros-event-camera/${repo}.git
 ```
-### Install system dependencies
-You will probably be missing the ``pybind11_catkin package``:
-```bash
-sudo apt-get install ros-${ROS_DISTRO}-pybind11-catkin
-```
-
-### configure and build on ROS1:
-
-```bash
-catkin config -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
-catkin build
-```
-
-### configure and build on ROS2:
-
-```bash
-cd ~/${pkg}_ws
-colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
-```
+and follow the [instructions here](https://github.com/ros-misc-utilities/.github/blob/master/docs/build_ros_repository.md)
 
 ## Decoding event array messages
 
@@ -84,12 +64,12 @@ bag = BagReader('foo', topic)
 decoder = Decoder()
 
 while bag.has_next():
-        topic, msg, t_rec = bag.read_next()
-        decoder.decode(msg)
-        cd_events = decoder.get_cd_events()
-        print(cd_events)
-        trig_events = decoder.get_ext_trig_events()
-        print(trig_events)
+    topic, msg, t_rec = bag.read_next()
+    decoder.decode(msg)
+    cd_events = decoder.get_cd_events()
+    print(cd_events)
+    trig_events = decoder.get_ext_trig_events()
+    print(trig_events)
 ```
 
 The returned event arrays are structured numpy ndarrays that are
