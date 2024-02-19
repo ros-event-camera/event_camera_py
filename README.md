@@ -1,4 +1,4 @@
-# event_camera_py
+# Processing ROS event camera data in python
 
 This repository holds ROS/ROS2 tools for processing
 [event_camera_msgs](https://github.com/ros-event-camera/event_camera_msgs)
@@ -6,7 +6,7 @@ under ROS and ROS2 with python. These messages are produced by the
 [metavision_driver](https://github.com/ros-event-camera/metavision_driver) and
 the [libcaer_driver](https://github.com/ros-event-camera/libcaer_driver).
 For decoding, the [event_camera_codecs](https://github.com/ros-event-camera/event_camera_codecs)
-package is used.
+package is used internally.
 
 With this repository you can quickly load events from a ROS/ROS2 bag
 into your python code. The decoder will return a structured numpy array of the same format that the Metavision SDK uses:
@@ -25,7 +25,12 @@ Continuous integration is tested under Ubuntu with the following ROS2 distros:
 
 No package is released for ROS1, but integration is tested under Ubuntu 20.04 and ROS Noetic.
 
-## How to download and build
+## How to install from packages
+Under ROS2 you can install the package via
+```bash
+sudo apt-get install ros-${ROS_DISTRO}-event-camera-py
+```
+## How to build from source
 
 Set the following shell variables:
 ```bash
@@ -35,6 +40,24 @@ url=https://github.com/ros-event-camera/${repo}.git
 and follow the [instructions here](https://github.com/ros-misc-utilities/.github/blob/master/docs/build_ros_repository.md)
 
 ## Decoding event array messages
+
+Here is a sample decoder for ROS2. It uses the BagReader helper class that you can find in the ``src`` folder.
+```python
+from bag_reader_ros2 import BagReader
+from event_camera_py import Decoder
+
+topic = '/event_camera/events'
+bag = BagReader('foo', topic)
+decoder = Decoder()
+
+while bag.has_next():
+    topic, msg, t_rec = bag.read_next()
+    decoder.decode(msg)
+    cd_events = decoder.get_cd_events()
+    print(cd_events)
+    trig_events = decoder.get_ext_trig_events()
+    print(trig_events)
+```
 
 The following sample code shows how to decode event array messages under ROS1.
 ```python
@@ -48,24 +71,6 @@ decoder = Decoder()
 for topic, msg, t in bag.read_messages(topics=topic):
     decoder.decode_bytes(msg.encoding, msg.width, msg.height,
 	                     msg.time_base, msg.events)
-    cd_events = decoder.get_cd_events()
-    print(cd_events)
-    trig_events = decoder.get_ext_trig_events()
-    print(trig_events)
-```
-Here is a sample code for ROS2. It uses a helper class "BagReader"
-that you can find in the ``src`` folder. Note the conversion to numpy array:
-```python
-from bag_reader_ros2 import BagReader
-from event_camera_py import Decoder
-
-topic = '/event_camera/events'
-bag = BagReader('foo', topic)
-decoder = Decoder()
-
-while bag.has_next():
-    topic, msg, t_rec = bag.read_next()
-    decoder.decode(msg)
     cd_events = decoder.get_cd_events()
     print(cd_events)
     trig_events = decoder.get_ext_trig_events()
