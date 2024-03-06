@@ -15,6 +15,7 @@
   <buildtool_depend condition="$ROS_VERSION == 2">python_cmake_module</buildtool_depend>
 
   <depend condition="$ROS_VERSION == 2">pybind11_vendor</depend>
+  <exec_depend condition="$ROS_VERSION == 2">rpyutils</exec_depend>
 
   <test_depend condition="$ROS_VERSION == 2">ament_lint_auto</test_depend>
   <test_depend condition="$ROS_VERSION == 2">ament_lint_common</test_depend>
@@ -24,6 +25,7 @@
   <test_depend condition="$ROS_VERSION == 2">rosidl_runtime_py</test_depend>
   <test_depend condition="$ROS_VERSION == 2">rosbag2_py</test_depend>
   <test_depend condition="$ROS_VERSION == 2">rosbag2_storage_default_plugins</test_depend>
+  <doc_depend condition="$ROS_VERSION == 2">rclpy</doc_depend>
   <!-- ROS1 dependencies -->
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
 
