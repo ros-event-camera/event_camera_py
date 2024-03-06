@@ -13,6 +13,11 @@
 # limitations under the License.
 #
 
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath('.'))
+
 project = 'event_camera_py'
 # copyright = '2024, Bernd Pfrommer'
 author = 'Bernd Pfrommer'
