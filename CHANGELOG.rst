@@ -2,6 +2,11 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* bumped cmake required
+* Contributors: Bernd Pfrommer
+
 1.2.5 (2024-03-06)
 ------------------
 * added current work dir to the path in conf.py
