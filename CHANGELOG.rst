@@ -2,8 +2,8 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.6 (2024-06-01)
+------------------
 * bumped cmake required
 * added current work dir to the path in conf.py
 * updated README for better viewing on rosindex
