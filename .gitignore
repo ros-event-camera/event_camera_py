@@ -2,3 +2,4 @@ src/__pycache__/
 event_camera_py/__pycache__/
 tests/__pycache__/
 event_camera_py/_event_camera_py.cpython*
+doc/generated
