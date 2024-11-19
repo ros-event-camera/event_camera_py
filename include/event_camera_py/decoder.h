@@ -68,6 +68,24 @@ public:
     return (std::tuple<bool, uint64_t>({reachedTimeLimit, nextTime}));
   }
 
+  std::tuple<bool, uint64_t> find_first_sensor_time(pybind11::object msg)
+  {
+    auto decoder = initialize_decoder(
+      get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
+      get_attr<uint32_t>(msg, "height"));
+
+    pybind11::object eventsObj = get_attr<pybind11::object>(msg, "events");
+    Py_buffer view;
+    if (PyObject_GetBuffer(eventsObj.ptr(), &view, PyBUF_CONTIG_RO) != 0) {
+      throw std::runtime_error("cannot convert events to byte buffer");
+    }
+    uint64_t firstTime{0};
+    const bool foundTime = decoder->findFirstSensorTime(
+      reinterpret_cast<const uint8_t *>(view.buf), view.len, &firstTime);
+    PyBuffer_Release(&view);
+    return (std::tuple<bool, uint64_t>({foundTime, firstTime}));
+  }
+
   void decode_bytes(
     const std::string & encoding, uint16_t width, uint16_t height, uint64_t timeBase,
     pybind11::bytes events)
@@ -125,6 +143,7 @@ private:
   DecoderType * initialize_decoder(const std::string & encoding, uint32_t width, uint32_t height)
   {
     accumulator_.initialize(width, height);
+    // this will only create a decoder on the first call, subsequently return instance
     auto decoder = decoderFactory_.getInstance(encoding, width, height);
     if (!decoder) {
       throw(std::runtime_error("no decoder for encoding " + encoding));
