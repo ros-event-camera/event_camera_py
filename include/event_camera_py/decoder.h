@@ -23,9 +23,11 @@
 #include <event_camera_py/event_ext_trig.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <string>
 #include <tuple>
+#include <variant>
 #include <vector>
 
 template <class A>
@@ -68,7 +70,7 @@ public:
     return (std::tuple<bool, uint64_t>({reachedTimeLimit, nextTime}));
   }
 
-  std::tuple<bool, uint64_t> find_first_sensor_time(pybind11::object msg)
+  std::variant<uint64_t, pybind11::none> find_first_sensor_time(pybind11::object msg)
   {
     auto decoder = initialize_decoder(
       get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
@@ -79,11 +81,16 @@ public:
     if (PyObject_GetBuffer(eventsObj.ptr(), &view, PyBUF_CONTIG_RO) != 0) {
       throw std::runtime_error("cannot convert events to byte buffer");
     }
+    decoder->setTimeBase(get_attr<uint64_t>(msg, "time_base"));
     uint64_t firstTime{0};
     const bool foundTime = decoder->findFirstSensorTime(
       reinterpret_cast<const uint8_t *>(view.buf), view.len, &firstTime);
     PyBuffer_Release(&view);
-    return (std::tuple<bool, uint64_t>({foundTime, firstTime}));
+    if (foundTime) {
+      return (firstTime);
+    } else {
+      return (pybind11::cast<pybind11::none>(Py_None));
+    }
   }
 
   void decode_bytes(
