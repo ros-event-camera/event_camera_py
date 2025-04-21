@@ -55,8 +55,9 @@ public:
     auto decoder = initialize_decoder(
       get_attr<std::string>(msg, "encoding"), get_attr<uint32_t>(msg, "width"),
       get_attr<uint32_t>(msg, "height"));
+    accumulator_.setHasSensorTimeSinceEpoch(decoder->hasSensorTimeSinceEpoch());
     accumulator_.reset_stored_events();
-
+    decoder->setTimeBase(get_attr<uint64_t>(msg, "time_base"));
     pybind11::object eventsObj = get_attr<pybind11::object>(msg, "events");
     Py_buffer view;
     if (PyObject_GetBuffer(eventsObj.ptr(), &view, PyBUF_CONTIG_RO) != 0) {
