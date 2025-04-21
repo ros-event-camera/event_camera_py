@@ -95,7 +95,7 @@ void declare_decoder(pybind11::module & m, std::string typestr)
         :rtype: tuple[boolean, uint64_t]
         )pbdoc")
     .def("find_first_sensor_time", &MyDecoder::find_first_sensor_time, R"pbdoc(
-        find_first_sensor_time(msg) -> tuple[Boolean, uint64_t]
+        find_first_sensor_time(msg) -> uint64|None
 
         Peeks into encoded message to find first event sensor time stamp. The
         boolean return flag indicates whether any time stamp was detected.
@@ -105,8 +105,8 @@ void declare_decoder(pybind11::module & m, std::string typestr)
 
         :param msg: event packet message to decode
         :type msg:  event_camera_msgs/msgs/EventPacket
-        :return: tuple with flag (true if event sensor time was found) and the sensor time
-        :rtype: tuple[boolean, uint64_t]
+        :return: sensor time
+        :rtype:  uint64_t or None if not found
         )pbdoc")
     .def("get_start_time", &MyDecoder::get_start_time, R"pbdoc(
         get_start_time() -> uint64
