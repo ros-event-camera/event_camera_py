@@ -1,0 +1,21 @@
+rosbag2_bagfile_information:
+  version: 5
+  storage_identifier: ""
+  duration:
+    nanoseconds: 990468399
+  starting_time:
+    nanoseconds_since_epoch: 1744227144744197147
+  message_count: 100
+  topics_with_message_count:
+    - topic_metadata:
+        name: /event_camera/events
+        type: event_camera_msgs/msg/EventPacket
+        serialization_format: cdr
+        offered_qos_profiles: "- history: keep_last\n  depth: 1000\n  reliability: best_effort\n  durability: volatile\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n    sec: 9223372036\n    nsec: 854775807\n  liveliness: automatic\n  liveliness_lease_duration:\n    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions: false"
+      message_count: 100
+  compression_format: ""
+  compression_mode: ""
+  relative_file_paths:
+    - test_events_2_0.mcap
+  files:
+    []
