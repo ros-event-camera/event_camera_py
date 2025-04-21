@@ -182,6 +182,20 @@ def test_unique_until(verbose=False):
     )
 
 
+def test_find_first_sensor_time(verbose=True):
+    bag = BagReader('tests/test_events_1', verbose)
+    if verbose:
+        print('Testing find_first_time_stamp')
+    decoder = Decoder()
+    for _, msg, _ in bag.read_messages(topics=['/event_camera/events']):
+        ts = decoder.find_first_sensor_time(msg)
+        assert ts is not None
+        if verbose:
+            print('first sensor time stamp: ', ts)
+        assert ts == 7139840
+        break
+
+
 if __name__ == '__main__':
     test_decode_bytes(True)
     test_decode_msg(True)

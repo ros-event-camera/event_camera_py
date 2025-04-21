@@ -94,6 +94,20 @@ void declare_decoder(pybind11::module & m, std::string typestr)
           time following time limit (only valid if time limit has been reached!)
         :rtype: tuple[boolean, uint64_t]
         )pbdoc")
+    .def("find_first_sensor_time", &MyDecoder::find_first_sensor_time, R"pbdoc(
+        find_first_sensor_time(msg) -> uint64|None
+
+        Peeks into encoded message to find first event sensor time stamp. The
+        boolean return flag indicates whether any time stamp was detected.
+        This function does not advance the state of the decoder, and will not
+        leverage state from previous message packets. It is typically used to cheaply find
+        the first time stamp in an EventPacket message without decoding the whole packet.
+
+        :param msg: event packet message to decode
+        :type msg:  event_camera_msgs/msgs/EventPacket
+        :return: sensor time
+        :rtype:  uint64_t or None if not found
+        )pbdoc")
     .def("get_start_time", &MyDecoder::get_start_time, R"pbdoc(
         get_start_time() -> uint64
         
