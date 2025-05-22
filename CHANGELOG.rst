@@ -2,8 +2,8 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.1 (2025-05-22)
+------------------
 * stop using ament_target_dependencies
 * fix bug with handling libcaer messages
 * Contributors: Bernd Pfrommer
