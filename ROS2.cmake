@@ -41,7 +41,7 @@ find_package(pybind11)
 
 
 pybind11_add_module(_event_camera_py SHARED src/decoder.cpp)
-ament_target_dependencies(_event_camera_py PUBLIC event_camera_codecs pybind11)
+target_link_libraries(_event_camera_py PUBLIC ${event_camera_codecs_TARGETS} pybind11::pybind11)
 
 #ament_python_install_module(${PROJECT_NAME})
 ament_python_install_package(${PROJECT_NAME})
