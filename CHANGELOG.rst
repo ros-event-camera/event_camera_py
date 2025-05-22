@@ -2,6 +2,12 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* stop using ament_target_dependencies
+* fix bug with handling libcaer messages
+* Contributors: Bernd Pfrommer
+
 2.0.0 (2025-04-21)
 ------------------
 * support find_first_sensor_time
