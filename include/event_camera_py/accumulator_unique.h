@@ -133,6 +133,7 @@ public:
   void clearImage() { memset(image_.data(), 0, image_.size()); }
 
   uint64_t get_start_time() const { return (startTime_); }
+  bool has_valid_start_time() const { return (hasStartTime_); }
   pybind11::list get_cd_event_packets() { return (get_event_packets(&cdEvents_)); }
   pybind11::list get_ext_trig_event_packets() { return (get_event_packets(&extTrigEvents_)); }
 

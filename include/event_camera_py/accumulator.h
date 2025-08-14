@@ -94,6 +94,7 @@ public:
   size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
   void initialize(uint32_t, uint32_t) {}
   void setHasSensorTimeSinceEpoch(bool b) { hasSensorTimeSinceEpoch_ = b; }
+  bool has_valid_start_time() const { return (hasStartTime_); }
   int32_t shorten_time(uint64_t t)
   {
     if (hasSensorTimeSinceEpoch_) {
