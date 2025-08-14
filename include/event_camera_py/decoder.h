@@ -88,6 +88,10 @@ public:
       reinterpret_cast<const uint8_t *>(view.buf), view.len, &firstTime);
     PyBuffer_Release(&view);
     if (foundTime) {
+      if (!accumulator_.has_valid_start_time() && foundTime && decoder->hasSensorTimeSinceEpoch()) {
+        startTime_ = firstTime;
+        hasStartTime_ = true;
+      }
       return (firstTime);
     } else {
       return (pybind11::cast<pybind11::none>(Py_None));
@@ -112,7 +116,19 @@ public:
     const uint8_t * buf = reinterpret_cast<const uint8_t *>(events.data());
     do_full_decode(encoding, width, height, timeBase, buf, events.size());
   }
-  uint64_t get_start_time() const { return (accumulator_.get_start_time()); }
+
+  std::variant<uint64_t, pybind11::none> get_start_time() const
+  {
+    // return cached start time or accumulator start time, or None
+    if (hasStartTime_) {
+      return (startTime_);
+    }
+    if (accumulator_.has_valid_start_time()) {
+      return (accumulator_.get_start_time());
+    }
+    return pybind11::cast<pybind11::none>(Py_None);
+  }
+
   pybind11::array_t<EventCD> get_cd_events() { return (accumulator_.get_cd_events()); }
   pybind11::array_t<EventExtTrig> get_ext_trig_events()
   {
@@ -163,6 +179,8 @@ private:
   // ------------ variables
   event_camera_codecs::DecoderFactory<event_camera_codecs::EventPacket, A> decoderFactory_;
   A accumulator_;
+  uint64_t startTime_{0};
+  bool hasStartTime_{false};
 };
 
 #endif  // EVENT_CAMERA_PY__DECODER_H_
