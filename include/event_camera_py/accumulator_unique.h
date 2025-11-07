@@ -53,7 +53,7 @@ public:
     numCDEvents_[std::min(polarity, uint8_t(1))]++;
   }
 
-  void eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override
+  bool eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override
   {
     // It is not yet clear what a good policy would be for the external triggers,
     // so just pass all of them in a single packet.
@@ -66,6 +66,7 @@ public:
 
     maxSizeExtTrig_ = std::max(extTrigEvents_.back()->size(), maxSizeExtTrig_);
     numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
+    return (true);
   }
   void finished() override {}
   void rawData(const char *, size_t) override {}
