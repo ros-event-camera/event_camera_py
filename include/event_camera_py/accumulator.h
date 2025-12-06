@@ -39,12 +39,13 @@ public:
     numCDEvents_[std::min(polarity, uint8_t(1))]++;
   }
 
-  void eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override
+  bool eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override
   {
     extTrigEvents_->push_back(EventExtTrig(
       static_cast<int16_t>(edge), static_cast<int64_t>(sensor_time), static_cast<int16_t>(id)));
     maxSizeExtTrig_ = std::max(extTrigEvents_->size(), maxSizeExtTrig_);
     numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
+    return (true);
   }
 
   void finished() override {}
@@ -94,6 +95,7 @@ public:
   size_t get_num_trigger_falling() const { return (numExtTrigEvents_[1]); }
   void initialize(uint32_t, uint32_t) {}
   void setHasSensorTimeSinceEpoch(bool b) { hasSensorTimeSinceEpoch_ = b; }
+  bool has_valid_start_time() const { return (hasStartTime_); }
   int32_t shorten_time(uint64_t t)
   {
     if (hasSensorTimeSinceEpoch_) {

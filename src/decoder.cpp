@@ -109,14 +109,16 @@ void declare_decoder(pybind11::module & m, std::string typestr)
         :rtype:  uint64_t or None if not found
         )pbdoc")
     .def("get_start_time", &MyDecoder::get_start_time, R"pbdoc(
-        get_start_time() -> uint64
+        get_start_time() -> uint64|None
         
-        This function is useful for sensors that provide absolute time stamps,
-        for example libcaer based devices. The time stamps of the decoded events
-        starts at zero, but the absolut event time in nanoseconds since begin of the epoch
-        can be recovered by adding the start time.
+        Returns None if the decoder does not support absolute time stamps
+        (since epoch) or if no event message packets have been decoded yet.
+        Otherwise, returns the absolute time stamp of the first decoded event, in
+        usec since begin of the epoch. This start time can be added to the
+        time stamp of the event array to get absolute time stamps, but beware of
+        the event time stamp rollover after 2^31 microseconds (about 35 minutes).
 
-        :return: start time offset for sensor time, in nanoseconds
+        :return: time since start of epoch of first event, or None if not available
         :rtype: uint64_t
         )pbdoc")
     .def("get_cd_events", &MyDecoder::get_cd_events, R"pbdoc(

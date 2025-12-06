@@ -53,7 +53,7 @@ public:
     numCDEvents_[std::min(polarity, uint8_t(1))]++;
   }
 
-  void eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override
+  bool eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override
   {
     // It is not yet clear what a good policy would be for the external triggers,
     // so just pass all of them in a single packet.
@@ -66,6 +66,7 @@ public:
 
     maxSizeExtTrig_ = std::max(extTrigEvents_.back()->size(), maxSizeExtTrig_);
     numExtTrigEvents_[std::min(edge, uint8_t(1))]++;
+    return (true);
   }
   void finished() override {}
   void rawData(const char *, size_t) override {}
@@ -133,6 +134,7 @@ public:
   void clearImage() { memset(image_.data(), 0, image_.size()); }
 
   uint64_t get_start_time() const { return (startTime_); }
+  bool has_valid_start_time() const { return (hasStartTime_); }
   pybind11::list get_cd_event_packets() { return (get_event_packets(&cdEvents_)); }
   pybind11::list get_ext_trig_event_packets() { return (get_event_packets(&extTrigEvents_)); }
 
