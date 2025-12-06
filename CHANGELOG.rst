@@ -2,8 +2,8 @@
 Changelog for package event_camera_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2025-12-06)
+------------------
 * eventExtTrigger() returns true now
 * get_start_time() returns None if sensor does not support abs time stamps
 * Contributors: Bernd Pfrommer
