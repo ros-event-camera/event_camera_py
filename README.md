@@ -10,38 +10,41 @@ package is used internally.
 
 With this repository you can quickly load events from a ROS/ROS2 bag
 into your python code. The decoder will return a structured numpy array of the same format that the Metavision SDK uses:
+
 ```python
 dtype={'names':['x','y','p','t'], 'formats':['<u2','<u2','i1','<i4'], 'offsets':[0,2,4,8], 'itemsize':12})]
 ```
+
 To access e.g. the timestamps (in microseconds) you would use ``foo['t']``, where ``foo`` is the numpy array returned by the decoder. See sample code below.
 
 ## Supported platforms
 
-Continuous integration is tested under Ubuntu with the following ROS2 distros:
-
- [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__event_camera_py__ubuntu_jammy_amd64&subject=Humble)](https://build.ros2.org/job/Hdev__event_camera_py__ubuntu_jammy_amd64/)
- [![Build Status](https://build.ros2.org/buildStatus/icon?job=Idev__event_camera_py__ubuntu_jammy_amd64&subject=Iron)](https://build.ros2.org/job/Idev__event_camera_py__ubuntu_jammy_amd64/)
- [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__event_camera_py__ubuntu_jammy_amd64&subject=Rolling)](https://build.ros2.org/job/Rdev__event_camera_py__ubuntu_jammy_amd64/)
-
-No package is released for ROS1, but integration is tested under Ubuntu 20.04 and ROS Noetic.
+Continuous integration is tested under Ubuntu for ROS2 Humble and later.
+The ROS1 code is left in place, but is no longer tested or supported.
 
 ## How to install from packages
+
 Under ROS2 you can install the package via
+
 ```bash
 sudo apt-get install ros-${ROS_DISTRO}-event-camera-py
 ```
+
 ## How to build from source
 
 Set the following shell variables:
+
 ```bash
 repo=event_camera_py
 url=https://github.com/ros-event-camera/${repo}.git
 ```
+
 and follow the [instructions here](https://github.com/ros-misc-utilities/.github/blob/master/docs/build_ros_repository.md)
 
 ## Decoding event array messages
 
 Here is a sample decoder for ROS2. It uses the BagReader helper class that you can find in the ``src`` folder.
+
 ```python
 from bag_reader_ros2 import BagReader
 from event_camera_py import Decoder
@@ -60,6 +63,7 @@ while bag.has_next():
 ```
 
 The following sample code shows how to decode event array messages under ROS1.
+
 ```python
 import rosbag
 from event_camera_py import Decoder
